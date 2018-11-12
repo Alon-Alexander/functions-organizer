@@ -1,4 +1,5 @@
 import { Editor, Document, Range, Selection, Position } from "./interfaces";
+import { mutableRange, rangeFromObject } from "./utils";
 
 interface IndexPosition {
   index: number;
@@ -70,6 +71,35 @@ export default class FunctionMove {
     let line = start.position.line;
     let character = start.position.character;
 
+    while (txt[i] !== "(") {
+      i++;
+      if (txt[i] === "\n") {
+        line++;
+        character = 0;
+      } else {
+        character++;
+      }
+    }
+
+    let counter = 1;
+    for (i++; counter > 0; i++) {
+      switch (txt[i]) {
+        case "(":
+          counter++;
+          break;
+        case ")":
+          counter--;
+          break;
+        default:
+      }
+      if (txt[i] === "\n") {
+        line++;
+        character = 0;
+      } else {
+        character++;
+      }
+    }
+
     while (txt[i] !== "{") {
       i++;
       if (txt[i] === "\n") {
@@ -79,7 +109,8 @@ export default class FunctionMove {
         character++;
       }
     }
-    let counter = 1;
+
+    counter = 1;
     for (i++; counter > 0; i++) {
       switch (txt[i]) {
         case "{":
@@ -143,13 +174,16 @@ export default class FunctionMove {
   }
 
   private moveSelection(index: SwapRanges): boolean {
-    const mul = index.secondIndex < index.rangeIndex ? 0 : 1;
+    const secondIsUp = index.secondIndex < index.rangeIndex;
+    const mul = secondIsUp ? 0 : 1;
+
     const firstLines =
       this.ranges[index.rangeIndex].end.line -
       this.ranges[index.rangeIndex].start.line;
     const secondLines =
       this.ranges[index.secondIndex].end.line -
       this.ranges[index.secondIndex].start.line;
+
     const linesDiff = secondLines - firstLines;
 
     this.editor.selection = new Selection(
@@ -169,13 +203,41 @@ export default class FunctionMove {
     return true;
   }
 
+  private swapInternalRanges(sr: SwapRanges) {
+    let first = this.ranges[sr.rangeIndex];
+    let second = this.ranges[sr.secondIndex];
+    let switched = first.start.line > second.start.line;
+
+    if (switched) {
+      [first, second] = [second, first];
+    }
+
+    const firstNew = mutableRange(first);
+    const secondNew = mutableRange(second);
+
+    const diffLines = second.start.line - first.start.line;
+    firstNew.start.line += diffLines;
+    firstNew.end.line += diffLines;
+    secondNew.start.line -= diffLines;
+    secondNew.end.line -= diffLines;
+
+    this.ranges[switched ? sr.secondIndex : sr.rangeIndex] = rangeFromObject(
+      secondNew
+    );
+    this.ranges[switched ? sr.rangeIndex : sr.secondIndex] = rangeFromObject(
+      firstNew
+    );
+  }
+
   private swapFunctions(sr: SwapRanges): Thenable<boolean> {
     return this.editor.edit(edit => {
-      const first = this.document.getText(this.ranges[sr.rangeIndex]);
-      const second = this.document.getText(this.ranges[sr.secondIndex]);
+      const firstText = this.document.getText(this.ranges[sr.rangeIndex]);
+      const secondText = this.document.getText(this.ranges[sr.secondIndex]);
 
-      edit.replace(this.ranges[sr.rangeIndex], second);
-      edit.replace(this.ranges[sr.secondIndex], first);
+      edit.replace(this.ranges[sr.rangeIndex], secondText);
+      edit.replace(this.ranges[sr.secondIndex], firstText);
+
+      this.swapInternalRanges(sr);
     });
   }
 

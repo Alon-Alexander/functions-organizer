@@ -3,6 +3,7 @@
     {
       "name": "1.js",
       "returnValue": true,
+      "amount": 1,
       "beforeRange": {
         "start": {
           "line": 12,
@@ -21,6 +22,56 @@
         "end": {
           "line": 5,
           "character": 10
+        }
+      }
+    },
+    {
+      "name": "1.js",
+      "returnValue": true,
+      "amount": 1,
+      "beforeRange": {
+        "start": {
+          "line": 11,
+          "character": 25
+        },
+        "end": {
+          "line": 11,
+          "character": 25
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 4,
+          "character": 25
+        },
+        "end": {
+          "line": 4,
+          "character": 25
+        }
+      }
+    },
+    {
+      "name": "2.js",
+      "returnValue": true,
+      "amount": 2,
+      "beforeRange": {
+        "start": {
+          "line": 17,
+          "character": 1
+        },
+        "end": {
+          "line": 17,
+          "character": 1
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 4,
+          "character": 1
+        },
+        "end": {
+          "line": 4,
+          "character": 1
         }
       }
     }

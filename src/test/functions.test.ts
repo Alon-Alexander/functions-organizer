@@ -1,33 +1,15 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
-import { readFile, readFileSync } from "fs";
+import { readFile, readFileSync, writeFileSync } from "fs";
 import FunctionMove from "../functions";
-
-interface TestMap {
-  name: string;
-  returnValue: boolean;
-  beforeRange: {
-    start: {
-      line: number;
-      character: number;
-    };
-    end: {
-      line: number;
-      character: number;
-    };
-  };
-  afterRange: {
-    start: {
-      line: number;
-      character: number;
-    };
-    end: {
-      line: number;
-      character: number;
-    };
-  };
-}
+import {
+  TestMap,
+  resolvePath,
+  setupDocument,
+  OUTPUT,
+  closeDocument
+} from "./testUtils";
 
 const testsMap: { tests: TestMap[] } = JSON.parse(
   String(
@@ -43,18 +25,6 @@ const testsMap: { tests: TestMap[] } = JSON.parse(
   )
 );
 
-const FOLDER = "src/test/data/";
-const INPUT = "input/";
-const OUTPUT = "output/";
-
-const resolvePath = (prefix: string, filename: string): string =>
-  path.resolve(
-    (vscode.workspace.workspaceFolders || [{ uri: { path: "" } }])[0].uri.path,
-    FOLDER,
-    prefix,
-    filename
-  );
-
 function getFile(prefix: string, filename: string): Thenable<string> {
   return new Promise((resolve, reject) => {
     readFile(resolvePath(prefix, filename), (err, data) => {
@@ -67,35 +37,30 @@ function getFile(prefix: string, filename: string): Thenable<string> {
   });
 }
 
-async function setupDocument(test: TestMap): Promise<vscode.TextEditor> {
-  let openPath = vscode.Uri.file(resolvePath(INPUT, test.name));
-  const editor = await vscode.workspace.openTextDocument(openPath).then(doc => {
-    return vscode.window.showTextDocument(doc);
+suite("Function Move Tests", function() {
+  before("Open editor", async () => {
+    await setupDocument(testsMap.tests[0]);
+    await closeDocument();
   });
 
-  const range = test.beforeRange;
-  editor.selection = new vscode.Selection(
-    new vscode.Position(range.start.line, range.start.character),
-    new vscode.Position(range.end.line, range.end.character)
-  );
-
-  return editor;
-}
-
-suite("Function Move Tests", function() {
   for (let i = 0; i < testsMap.tests.length; i++) {
-    test(`Move Up - Case ${testsMap.tests[i].name}`, async () => {
+    test(`Move Up - Case ${i} (${testsMap.tests[i].name})`, async () => {
       const test = testsMap.tests[i];
 
       const editor = await setupDocument(test);
 
-      const returnValue = await new FunctionMove(editor).moveUp(
-        editor.selection
-      );
-      assert.equal(returnValue, test.returnValue);
+      const fm = new FunctionMove(editor);
+      for (let j = 0; j < test.amount; j++) {
+        const returnValue = await fm.moveUp(editor.selection);
+        assert.equal(returnValue, test.returnValue, "returned value");
+      }
 
+      writeFileSync(
+        resolvePath(OUTPUT, `output-${i}.js`),
+        editor.document.getText()
+      );
       const content = await getFile(OUTPUT, test.name);
-      assert.equal(editor.document.getText(), content);
+      assert.equal(editor.document.getText(), content, "content of file");
 
       const after = test.afterRange;
       assert.deepEqual(
@@ -103,8 +68,10 @@ suite("Function Move Tests", function() {
         new vscode.Selection(
           new vscode.Position(after.start.line, after.start.character),
           new vscode.Position(after.end.line, after.end.character)
-        )
+        ),
+        "selection in file"
       );
+      await closeDocument();
     });
   }
 });

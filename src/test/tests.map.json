@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "1.js",
+      "returnValue": true,
+      "beforeRange": {
+        "start": {
+          "line": 12,
+          "character": 6
+        },
+        "end": {
+          "line": 12,
+          "character": 10
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 5,
+          "character": 6
+        },
+        "end": {
+          "line": 5,
+          "character": 10
+        }
+      }
+    }
+  ]
+}

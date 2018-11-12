@@ -1,10 +1,4 @@
-import * as vscode from "vscode";
-import Range = vscode.Range;
-import Selection = vscode.Selection;
-import TextDocument = vscode.TextDocument;
-import TextEditor = vscode.TextEditor;
-import Position = vscode.Position;
-import { AssertionError } from "assert";
+import { Editor, Document, Range, Selection, Position } from "./interfaces";
 
 interface IndexPosition {
   index: number;
@@ -31,10 +25,10 @@ export default class FunctionMove {
   private txt: string = "";
   private ranges: Range[] = [];
 
-  private editor: TextEditor;
-  private document: TextDocument;
+  private editor: Editor;
+  private document: Document;
 
-  constructor(e: TextEditor) {
+  constructor(e: Editor) {
     this.editor = e;
     this.document = e.document;
 
@@ -148,27 +142,34 @@ export default class FunctionMove {
     return null;
   }
 
-  private moveSelection(index: SwapRanges): void {
+  private moveSelection(index: SwapRanges): boolean {
     const mul = index.secondIndex < index.rangeIndex ? 0 : 1;
-    const firstLines = this.ranges[index.rangeIndex].end.line - this.ranges[index.rangeIndex].start.line;
-    const secondLines = this.ranges[index.secondIndex].end.line - this.ranges[index.secondIndex].start.line;
+    const firstLines =
+      this.ranges[index.rangeIndex].end.line -
+      this.ranges[index.rangeIndex].start.line;
+    const secondLines =
+      this.ranges[index.secondIndex].end.line -
+      this.ranges[index.secondIndex].start.line;
     const linesDiff = secondLines - firstLines;
 
     this.editor.selection = new Selection(
       new Position(
-        this.ranges[index.secondIndex].start.line + index.start.lineOffset + mul * linesDiff,
+        this.ranges[index.secondIndex].start.line +
+          index.start.lineOffset +
+          mul * linesDiff,
         index.start.character
       ),
       new Position(
-        this.ranges[index.secondIndex].start.line + index.end.lineOffset + mul * linesDiff,
+        this.ranges[index.secondIndex].start.line +
+          index.end.lineOffset +
+          mul * linesDiff,
         index.end.character
       )
     );
+    return true;
   }
 
-  private swapFunctions(
-    sr: SwapRanges
-  ): Thenable<boolean> {
+  private swapFunctions(sr: SwapRanges): Thenable<boolean> {
     return this.editor.edit(edit => {
       const first = this.document.getText(this.ranges[sr.rangeIndex]);
       const second = this.document.getText(this.ranges[sr.secondIndex]);
@@ -178,36 +179,37 @@ export default class FunctionMove {
     });
   }
 
-  public moveUp(sel: Selection): void {
+  public moveUp(sel: Selection): Thenable<boolean> {
     const index = this.getSelectionRangeIndex(sel);
     if (this.ranges.length < 2 || !index) {
-      return;
+      return Promise.resolve(false);
     }
 
     if (index.rangeIndex > 0) {
       const sr: SwapRanges = {
         ...index,
-        secondIndex: index.rangeIndex - 1,
+        secondIndex: index.rangeIndex - 1
       };
-      this.swapFunctions(sr).then(() =>
-        this.moveSelection(sr)
-      );
+      return this.swapFunctions(sr).then(() => this.moveSelection(sr));
     }
+
+    return Promise.resolve(false);
   }
 
-  public moveDown(sel: Selection): void {
+  public moveDown(sel: Selection): Thenable<boolean> {
     const index = this.getSelectionRangeIndex(sel);
     if (this.ranges.length < 2 || !index) {
-      return;
+      return Promise.resolve(false);
     }
 
     if (index.rangeIndex < this.ranges.length - 1) {
       const sr: SwapRanges = {
         ...index,
-        secondIndex: index.rangeIndex + 1,
+        secondIndex: index.rangeIndex + 1
       };
-      this.swapFunctions(sr).then(() =>
-        this.moveSelection(sr)
-      );
+      return this.swapFunctions(sr).then(() => this.moveSelection(sr));
     }
+
+    return Promise.resolve(false);
+  }
 }

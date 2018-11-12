@@ -1,4 +1,4 @@
-import { Editor, Document, Range, Selection, Position } from "./interfaces";
+import { TextEditor, TextDocument, Range, Selection, Position } from "vscode";
 import { mutableRange, rangeFromObject } from "./utils";
 
 interface IndexPosition {
@@ -26,10 +26,10 @@ export default class FunctionMove {
   private txt: string = "";
   private ranges: Range[] = [];
 
-  private editor: Editor;
-  private document: Document;
+  private editor: TextEditor;
+  private document: TextDocument;
 
-  constructor(e: Editor) {
+  constructor(e: TextEditor) {
     this.editor = e;
     this.document = e.document;
 

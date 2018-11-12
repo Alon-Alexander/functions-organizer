@@ -38,11 +38,6 @@ function getFile(prefix: string, filename: string): Thenable<string> {
 }
 
 suite("Function Move Tests", function() {
-  before("Open editor", async () => {
-    await setupDocument(testsMap.tests[0]);
-    await closeDocument();
-  });
-
   for (let i = 0; i < testsMap.tests.length; i++) {
     test(`Move Up - Case ${i} (${testsMap.tests[i].name})`, async () => {
       const test = testsMap.tests[i];

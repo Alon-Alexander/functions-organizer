@@ -1,10 +1,5 @@
-import * as vscode from "vscode";
-import Range = vscode.Range;
-import Selection = vscode.Selection;
-import TextDocument = vscode.TextDocument;
-import TextEditor = vscode.TextEditor;
-import Position = vscode.Position;
-import { AssertionError } from "assert";
+import { Editor, Document, Range, Selection, Position } from "./interfaces";
+import { mutableRange, rangeFromObject } from "./utils";
 
 interface IndexPosition {
   index: number;
@@ -31,10 +26,10 @@ export default class FunctionMove {
   private txt: string = "";
   private ranges: Range[] = [];
 
-  private editor: TextEditor;
-  private document: TextDocument;
+  private editor: Editor;
+  private document: Document;
 
-  constructor(e: TextEditor) {
+  constructor(e: Editor) {
     this.editor = e;
     this.document = e.document;
 
@@ -76,6 +71,35 @@ export default class FunctionMove {
     let line = start.position.line;
     let character = start.position.character;
 
+    while (txt[i] !== "(") {
+      i++;
+      if (txt[i] === "\n") {
+        line++;
+        character = 0;
+      } else {
+        character++;
+      }
+    }
+
+    let counter = 1;
+    for (i++; counter > 0; i++) {
+      switch (txt[i]) {
+        case "(":
+          counter++;
+          break;
+        case ")":
+          counter--;
+          break;
+        default:
+      }
+      if (txt[i] === "\n") {
+        line++;
+        character = 0;
+      } else {
+        character++;
+      }
+    }
+
     while (txt[i] !== "{") {
       i++;
       if (txt[i] === "\n") {
@@ -85,7 +109,8 @@ export default class FunctionMove {
         character++;
       }
     }
-    let counter = 1;
+
+    counter = 1;
     for (i++; counter > 0; i++) {
       switch (txt[i]) {
         case "{":
@@ -148,66 +173,105 @@ export default class FunctionMove {
     return null;
   }
 
-  private moveSelection(index: SwapRanges): void {
-    const mul = index.secondIndex < index.rangeIndex ? 0 : 1;
-    const firstLines = this.ranges[index.rangeIndex].end.line - this.ranges[index.rangeIndex].start.line;
-    const secondLines = this.ranges[index.secondIndex].end.line - this.ranges[index.secondIndex].start.line;
+  private moveSelection(index: SwapRanges): boolean {
+    const secondIsUp = index.secondIndex < index.rangeIndex;
+    const mul = secondIsUp ? 0 : 1;
+
+    const firstLines =
+      this.ranges[index.rangeIndex].end.line -
+      this.ranges[index.rangeIndex].start.line;
+    const secondLines =
+      this.ranges[index.secondIndex].end.line -
+      this.ranges[index.secondIndex].start.line;
+
     const linesDiff = secondLines - firstLines;
 
     this.editor.selection = new Selection(
       new Position(
-        this.ranges[index.secondIndex].start.line + index.start.lineOffset + mul * linesDiff,
+        this.ranges[index.secondIndex].start.line +
+          index.start.lineOffset +
+          mul * linesDiff,
         index.start.character
       ),
       new Position(
-        this.ranges[index.secondIndex].start.line + index.end.lineOffset + mul * linesDiff,
+        this.ranges[index.secondIndex].start.line +
+          index.end.lineOffset +
+          mul * linesDiff,
         index.end.character
       )
     );
+    return true;
   }
 
-  private swapFunctions(
-    sr: SwapRanges
-  ): Thenable<boolean> {
-    return this.editor.edit(edit => {
-      const first = this.document.getText(this.ranges[sr.rangeIndex]);
-      const second = this.document.getText(this.ranges[sr.secondIndex]);
+  private swapInternalRanges(sr: SwapRanges) {
+    let first = this.ranges[sr.rangeIndex];
+    let second = this.ranges[sr.secondIndex];
+    let switched = first.start.line > second.start.line;
 
-      edit.replace(this.ranges[sr.rangeIndex], second);
-      edit.replace(this.ranges[sr.secondIndex], first);
+    if (switched) {
+      [first, second] = [second, first];
+    }
+
+    const firstNew = mutableRange(first);
+    const secondNew = mutableRange(second);
+
+    const diffLines = second.start.line - first.start.line;
+    firstNew.start.line += diffLines;
+    firstNew.end.line += diffLines;
+    secondNew.start.line -= diffLines;
+    secondNew.end.line -= diffLines;
+
+    this.ranges[switched ? sr.secondIndex : sr.rangeIndex] = rangeFromObject(
+      secondNew
+    );
+    this.ranges[switched ? sr.rangeIndex : sr.secondIndex] = rangeFromObject(
+      firstNew
+    );
+  }
+
+  private swapFunctions(sr: SwapRanges): Thenable<boolean> {
+    return this.editor.edit(edit => {
+      const firstText = this.document.getText(this.ranges[sr.rangeIndex]);
+      const secondText = this.document.getText(this.ranges[sr.secondIndex]);
+
+      edit.replace(this.ranges[sr.rangeIndex], secondText);
+      edit.replace(this.ranges[sr.secondIndex], firstText);
+
+      this.swapInternalRanges(sr);
     });
   }
 
-  public moveUp(sel: Selection): void {
+  public moveUp(sel: Selection): Thenable<boolean> {
     const index = this.getSelectionRangeIndex(sel);
     if (this.ranges.length < 2 || !index) {
-      return;
+      return Promise.resolve(false);
     }
 
     if (index.rangeIndex > 0) {
       const sr: SwapRanges = {
         ...index,
-        secondIndex: index.rangeIndex - 1,
+        secondIndex: index.rangeIndex - 1
       };
-      this.swapFunctions(sr).then(() =>
-        this.moveSelection(sr)
-      );
+      return this.swapFunctions(sr).then(() => this.moveSelection(sr));
     }
+
+    return Promise.resolve(false);
   }
 
-  public moveDown(sel: Selection): void {
+  public moveDown(sel: Selection): Thenable<boolean> {
     const index = this.getSelectionRangeIndex(sel);
     if (this.ranges.length < 2 || !index) {
-      return;
+      return Promise.resolve(false);
     }
 
     if (index.rangeIndex < this.ranges.length - 1) {
       const sr: SwapRanges = {
         ...index,
-        secondIndex: index.rangeIndex + 1,
+        secondIndex: index.rangeIndex + 1
       };
-      this.swapFunctions(sr).then(() =>
-        this.moveSelection(sr)
-      );
+      return this.swapFunctions(sr).then(() => this.moveSelection(sr));
     }
+
+    return Promise.resolve(false);
+  }
 }

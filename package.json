@@ -1,7 +1,7 @@
 {
   "name": "functions-organizer",
   "displayName": "Functions Organizer",
-  "description": "A tool to move and organize functions in a file using shortcuts instead cut-paste.",
+  "description": "An extension to move and organize functions in a file using shortcuts instead cut-paste.",
   "version": "0.0.1",
   "publisher": "alon008",
   "engines": {

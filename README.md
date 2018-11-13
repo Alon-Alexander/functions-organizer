@@ -40,6 +40,18 @@ Nothing is guarenteed to work and everything is WIP.
 
 This repository is under the [MIT license](LICENSE).
 
-# Contributions
+# TODO Section
+
+### JavaScript
+
+- [ ] Add LOTS of tests.
+- [ ] Test combinations of actions and multiple actions.
+- [ ] Support in arrow functions.
+- [ ] Support for function sort.
+- [ ] Support for classes.
+
+Which _language_ should come next? (I think to support JSON)
+
+# Contributors
 
 Created and maintained by [Alon Alexander](https://github.com/Alon-Alexander).

@@ -5,10 +5,15 @@ const FOLDER = "src/test/data/";
 const INPUT = "input/";
 export const OUTPUT = "output/";
 
+export enum ACTION {
+  UP = 'UP',
+  DOWN = 'DOWN',
+};
+
 export interface TestMap {
   name: string;
-  returnValue: boolean;
-  amount: number;
+  returnValues: [boolean];
+  actions: [ACTION];
   beforeRange: {
     start: {
       line: number;

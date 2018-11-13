@@ -8,7 +8,8 @@ import {
     resolvePath,
     setupDocument,
     OUTPUT,
-    closeDocument
+    closeDocument,
+    ACTION
 } from "./testUtils";
 
 const testsMap: { tests: TestMap[] } = JSON.parse(
@@ -45,9 +46,20 @@ suite("Function Move Tests", function () {
             const editor = await setupDocument(test);
 
             const fm = new FunctionMove(editor);
-            for (let j = 0; j < test.amount; j++) {
-                const returnValue = await fm.moveUp(editor.selection);
-                assert.equal(returnValue, test.returnValue, "returned value");
+            for (let j = 0; j < test.actions.length; j++) {
+                let returnValue: boolean | null;
+                switch (test.actions[j]) {
+                    case ACTION.UP:
+                        returnValue = await fm.moveUp(editor.selection);
+                        break;
+                    case ACTION.DOWN:
+                        returnValue = await fm.moveDown(editor.selection);
+                        break;
+                    default:
+                        returnValue = null;
+                }
+                assert.notEqual(returnValue, null, `Error in tests\' map file - invalid action on index ${j}`);
+                assert.equal(returnValue, test.returnValues[j], "returned value");
             }
 
             writeFileSync(

@@ -2,8 +2,12 @@
   "tests": [
     {
       "name": "1.js",
-      "returnValue": true,
-      "amount": 1,
+      "returnValues": [
+        true
+      ],
+      "actions": [
+        "UP"
+      ],
       "beforeRange": {
         "start": {
           "line": 12,
@@ -27,8 +31,12 @@
     },
     {
       "name": "1.js",
-      "returnValue": true,
-      "amount": 1,
+      "returnValues": [
+        true
+      ],
+      "actions": [
+        "UP"
+      ],
       "beforeRange": {
         "start": {
           "line": 11,
@@ -52,8 +60,14 @@
     },
     {
       "name": "2.js",
-      "returnValue": true,
-      "amount": 2,
+      "returnValues": [
+        true,
+        true
+      ],
+      "actions": [
+        "UP",
+        "UP"
+      ],
       "beforeRange": {
         "start": {
           "line": 17,

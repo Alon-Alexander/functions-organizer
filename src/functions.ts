@@ -1,26 +1,8 @@
 import { Position, Range, Selection, TextDocument, TextEditor } from "vscode";
-import { mutableRange, rangeFromObject } from "./utils";
+import { mutableRange, rangeFromObject, findPositionAfterBrackets, getPositionFromIndex } from "./utils";
+import { ISwapRanges, IRangeAndOffset } from "./interfaces";
+import IndexPosition from "./indexPosition";
 
-interface IIndexPosition {
-    index: number;
-    position: Position;
-}
-
-interface IRangeAndOffset {
-    rangeIndex: number;
-    start: {
-        lineOffset: number;
-        character: number;
-    };
-    end: {
-        lineOffset: number;
-        character: number;
-    };
-}
-
-interface ISwapRanges extends IRangeAndOffset {
-    secondIndex: number;
-}
 
 export default class FunctionMove {
     private txt: string = "";
@@ -71,101 +53,9 @@ export default class FunctionMove {
         return Promise.resolve(false);
     }
 
-    private getPositionFromIndex(
-        txt: string,
-        index: number,
-        start: IIndexPosition | null = null
-    ): IIndexPosition {
-        if (!start) {
-            start = {
-                index: 0,
-                position: new Position(0, 0)
-            };
-        }
-
-        let line = start.position.line;
-        let character = start.position.character;
-        for (let i = start.index; i < index; i++) {
-            if (txt[i] === "\n") {
-                line++;
-                character = 0;
-            } else {
-                character++;
-            }
-        }
-
-        return {
-            index,
-            position: new Position(line, character)
-        };
-    }
-
-    private getClosingBracketPosition(txt: string, start: IIndexPosition) {
-        let i = start.index;
-        let line = start.position.line;
-        let character = start.position.character;
-
-        while (txt[i] !== "(") {
-            i++;
-            if (txt[i] === "\n") {
-                line++;
-                character = 0;
-            } else {
-                character++;
-            }
-        }
-
-        let counter = 1;
-        for (i++; counter > 0; i++) {
-            switch (txt[i]) {
-                case "(":
-                    counter++;
-                    break;
-                case ")":
-                    counter--;
-                    break;
-                default:
-            }
-            if (txt[i] === "\n") {
-                line++;
-                character = 0;
-            } else {
-                character++;
-            }
-        }
-
-        while (txt[i] !== "{") {
-            i++;
-            if (txt[i] === "\n") {
-                line++;
-                character = 0;
-            } else {
-                character++;
-            }
-        }
-
-        counter = 1;
-        for (i++; counter > 0; i++) {
-            switch (txt[i]) {
-                case "{":
-                    counter++;
-                    break;
-                case "}":
-                    counter--;
-                    break;
-                default:
-            }
-            if (txt[i] === "\n") {
-                line++;
-                character = 0;
-            } else {
-                character++;
-            }
-        }
-        return {
-            index: i,
-            position: new Position(line, character)
-        };
+    private getClosingBracketPosition(txt: string, inout: IndexPosition): void {
+        findPositionAfterBrackets(txt, '(', inout);
+        findPositionAfterBrackets(txt, '{', inout);
     }
 
     private getFunctionsRanges(): void {
@@ -175,11 +65,12 @@ export default class FunctionMove {
 
         let arr = reg.exec(this.txt);
         while (arr !== null) {
-            const start = this.getPositionFromIndex(
+            const start = getPositionFromIndex(
                 this.txt,
                 reg.lastIndex - arr[0].length
             );
-            const end = this.getClosingBracketPosition(this.txt, start);
+            const end = start.clone();
+            this.getClosingBracketPosition(this.txt, end);
             ranges.push(new Range(start.position, end.position));
             arr = reg.exec(this.txt);
         }

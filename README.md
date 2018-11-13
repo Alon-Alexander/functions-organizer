@@ -10,6 +10,12 @@ The plugin exposes a few actions, and it binds these to keyboard shortcuts:
 - Move function up (`control+shift+up`).
 - Move function down (`control+shit+up`).
 
+### Language Support
+
+A list of programming languages this plugin supports:
+
+- Javascript
+
 ## Requirements && Extension Settings
 
 No requirements nor extension settings for now.

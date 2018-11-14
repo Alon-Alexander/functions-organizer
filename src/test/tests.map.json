@@ -199,6 +199,81 @@
           "character": 9
         }
       }
+    },
+    {
+      "name": "5.js",
+      "returnValue": true,
+      "action": "UP",
+      "beforeRange": {
+        "start": {
+          "line": 3,
+          "character": 6
+        },
+        "end": {
+          "line": 3,
+          "character": 7
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 0,
+          "character": 6
+        },
+        "end": {
+          "line": 0,
+          "character": 7
+        }
+      }
+    },
+    {
+      "name": "6.js",
+      "returnValue": true,
+      "action": "DOWN",
+      "beforeRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 7,
+          "character": 0
+        },
+        "end": {
+          "line": 7,
+          "character": 0
+        }
+      }
+    },
+    {
+      "name": "7.js",
+      "returnValue": true,
+      "action": "UP",
+      "beforeRange": {
+        "start": {
+          "line": 8,
+          "character": 17
+        },
+        "end": {
+          "line": 12,
+          "character": 1
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 0,
+          "character": 17
+        },
+        "end": {
+          "line": 4,
+          "character": 1
+        }
+      }
     }
   ]
 }

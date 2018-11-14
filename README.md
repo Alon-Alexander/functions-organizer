@@ -32,22 +32,10 @@ Writing the basics.
 
 -----------------------------------------------------------------------------------------------------------
 
-# License
+## License
 
 This repository is under the [MIT license](LICENSE).
 
-# TODO Section
-
-### JavaScript
-
-- [ ] Add LOTS of tests.
-- [x] Support in arrow functions.
-- [ ] Support for `export` keywork.
-- [ ] Support for function sort.
-- [ ] Support for classes.
-
-Which _language_ should come next? (I think to support JSON)
-
-# Contributors
+## Contributors
 
 Created and maintained by [Alon Alexander](https://github.com/Alon-Alexander).

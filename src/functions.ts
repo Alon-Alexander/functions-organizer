@@ -1,6 +1,6 @@
 import { Position, Range, Selection, TextDocument, TextEditor } from "vscode";
 import { mutableRange, rangeFromObject, findPositionAfterBrackets, getPositionFromIndex } from "./utils";
-import { ISwapRanges, IRangeAndOffset } from "./interfaces";
+import { ISwapRanges, IRangeAndOffset, RegexObject } from "./interfaces";
 import IndexPosition from "./indexPosition";
 import consts from "./consts";
 import re from "./regex";
@@ -69,13 +69,13 @@ export default class FunctionMove {
     private getFunctionsRanges(): void {
         const ranges: Range[] = [];
 
-        const reg: RegExp = re[this.language][this.regType];
+        const { reg, index }: RegexObject = re[this.language][this.regType];
 
         let arr = reg.exec(this.txt);
         while (arr !== null) {
             const start = getPositionFromIndex(
                 this.txt,
-                reg.lastIndex - arr[1].length
+                reg.lastIndex - arr[index].length
             );
             const end = start.clone();
             this.getClosingBracketPosition(this.txt, end);

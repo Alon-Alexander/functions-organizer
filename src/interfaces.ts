@@ -24,3 +24,8 @@ export interface MutableRange {
         character: number;
     };
 }
+
+export interface RegexObject {
+    reg: RegExp;
+    index: number;
+}

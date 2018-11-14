@@ -2,7 +2,7 @@
   "name": "functions-organizer",
   "displayName": "Functions Organizer",
   "description": "An extension to move and organize functions in a file using shortcuts instead cut-paste.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "alon008",
   "engines": {
     "vscode": "^1.28.0"
@@ -48,10 +48,12 @@
     "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "typescript": "^2.6.1",
-    "vscode": "^1.1.21",
-    "tslint": "^5.8.0",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^2.2.42",
     "@types/node": "^8.10.25",
-    "@types/mocha": "^2.2.42"
+    "chai": "^4.2.0",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.1",
+    "vscode": "^1.1.21"
   }
 }

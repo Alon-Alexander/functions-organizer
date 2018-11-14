@@ -1,277 +1,177 @@
-import { TextEditor, TextDocument, Range, Selection, Position } from "vscode";
-import { mutableRange, rangeFromObject } from "./utils";
+import { Position, Range, Selection, TextDocument, TextEditor } from "vscode";
+import { mutableRange, rangeFromObject, findPositionAfterBrackets, getPositionFromIndex } from "./utils";
+import { ISwapRanges, IRangeAndOffset } from "./interfaces";
+import IndexPosition from "./indexPosition";
+import consts from "./consts";
+import re from "./regex";
 
-interface IndexPosition {
-  index: number;
-  position: Position;
-}
-
-interface RangeAndOffset {
-  rangeIndex: number;
-  start: {
-    lineOffset: number;
-    character: number;
-  };
-  end: {
-    lineOffset: number;
-    character: number;
-  };
-}
-
-interface SwapRanges extends RangeAndOffset {
-  secondIndex: number;
-}
 
 export default class FunctionMove {
-  private txt: string = "";
-  private ranges: Range[] = [];
+    private txt: string = "";
+    private ranges: Range[] = [];
 
-  private editor: TextEditor;
-  private document: TextDocument;
+    private editor: TextEditor;
+    private document: TextDocument;
 
-  constructor(e: TextEditor) {
-    this.editor = e;
-    this.document = e.document;
+    private language: string;
+    private regType: string;
 
-    this.txt = this.document.getText();
-    this.getFunctionsRanges();
-  }
+    constructor(e: TextEditor) {
+        this.editor = e;
+        this.document = e.document;
 
-  private getPositionFromIndex(
-    txt: string,
-    index: number,
-    start: IndexPosition | null = null
-  ): IndexPosition {
-    if (!start) {
-      start = {
-        index: 0,
-        position: new Position(0, 0)
-      };
+        this.language = consts.JAVASCRIPT;
+        this.regType = consts.FUNCTION;
+
+        this.txt = this.document.getText();
+        this.getFunctionsRanges();
     }
 
-    let line = start.position.line;
-    let character = start.position.character;
-    for (let i = start.index; i < index; i++) {
-      if (txt[i] === "\n") {
-        line++;
-        character = 0;
-      } else {
-        character++;
-      }
+    public moveUp(sel: Selection): Thenable<boolean> {
+        const index = this.getSelectionRangeIndex(sel);
+        if (this.ranges.length < 2 || !index) {
+            return Promise.resolve(false);
+        }
+
+        if (index.rangeIndex > 0) {
+            const sr: ISwapRanges = {
+                ...index,
+                secondIndex: index.rangeIndex - 1
+            };
+            return this.swapFunctions(sr).then(() => this.moveSelection(sr));
+        }
+
+        return Promise.resolve(false);
     }
 
-    return {
-      index,
-      position: new Position(line, character)
-    };
-  }
+    public moveDown(sel: Selection): Thenable<boolean> {
+        const index = this.getSelectionRangeIndex(sel);
+        if (this.ranges.length < 2 || !index) {
+            return Promise.resolve(false);
+        }
 
-  private getClosingBracketPosition(txt: string, start: IndexPosition) {
-    let i = start.index;
-    let line = start.position.line;
-    let character = start.position.character;
+        if (index.rangeIndex < this.ranges.length - 1) {
+            const sr: ISwapRanges = {
+                ...index,
+                secondIndex: index.rangeIndex + 1
+            };
+            return this.swapFunctions(sr).then(() => this.moveSelection(sr));
+        }
 
-    while (txt[i] !== "(") {
-      i++;
-      if (txt[i] === "\n") {
-        line++;
-        character = 0;
-      } else {
-        character++;
-      }
+        return Promise.resolve(false);
     }
 
-    let counter = 1;
-    for (i++; counter > 0; i++) {
-      switch (txt[i]) {
-        case "(":
-          counter++;
-          break;
-        case ")":
-          counter--;
-          break;
-        default:
-      }
-      if (txt[i] === "\n") {
-        line++;
-        character = 0;
-      } else {
-        character++;
-      }
+    private getClosingBracketPosition(txt: string, inout: IndexPosition): void {
+        findPositionAfterBrackets(txt, '(', inout);
+        findPositionAfterBrackets(txt, '{', inout);
     }
 
-    while (txt[i] !== "{") {
-      i++;
-      if (txt[i] === "\n") {
-        line++;
-        character = 0;
-      } else {
-        character++;
-      }
+    private getFunctionsRanges(): void {
+        const ranges: Range[] = [];
+
+        const reg: RegExp = re[this.language][this.regType];
+
+        let arr = reg.exec(this.txt);
+        while (arr !== null) {
+            const start = getPositionFromIndex(
+                this.txt,
+                reg.lastIndex - arr[1].length
+            );
+            const end = start.clone();
+            this.getClosingBracketPosition(this.txt, end);
+            ranges.push(new Range(start.position, end.position));
+            arr = reg.exec(this.txt);
+        }
+
+        this.ranges = ranges;
     }
 
-    counter = 1;
-    for (i++; counter > 0; i++) {
-      switch (txt[i]) {
-        case "{":
-          counter++;
-          break;
-        case "}":
-          counter--;
-          break;
-        default:
-      }
-      if (txt[i] === "\n") {
-        line++;
-        character = 0;
-      } else {
-        character++;
-      }
-    }
-    return {
-      index: i,
-      position: new Position(line, character)
-    };
-  }
+    private getSelectionRangeIndex(sel: Selection): IRangeAndOffset | null {
+        for (let i = 0; i < this.ranges.length; i++) {
+            if (this.ranges[i].contains(sel)) {
+                const range = this.ranges[i];
 
-  private getFunctionsRanges(): void {
-    const ranges: Range[] = [];
-
-    const reg: RegExp = /function\s+\w+\s*\([^)]*\)/g;
-
-    let arr;
-    while ((arr = reg.exec(this.txt)) !== null) {
-      const start = this.getPositionFromIndex(
-        this.txt,
-        reg.lastIndex - arr[0].length
-      );
-      const end = this.getClosingBracketPosition(this.txt, start);
-      ranges.push(new Range(start.position, end.position));
+                return {
+                    end: {
+                        character: sel.end.character,
+                        lineOffset: sel.end.line - range.start.line
+                    },
+                    rangeIndex: i,
+                    start: {
+                        character: sel.start.character,
+                        lineOffset: sel.start.line - range.start.line
+                    }
+                };
+            }
+        }
+        return null;
     }
 
-    this.ranges = ranges;
-  }
+    private moveSelection(index: ISwapRanges): boolean {
+        const secondIsUp = index.secondIndex < index.rangeIndex;
+        const mul = secondIsUp ? 0 : -1;
 
-  private getSelectionRangeIndex(sel: Selection): RangeAndOffset | null {
-    for (let i = 0; i < this.ranges.length; i++) {
-      if (this.ranges[i].contains(sel)) {
-        const range = this.ranges[i];
+        const firstLines =
+            this.ranges[index.rangeIndex].end.line -
+            this.ranges[index.rangeIndex].start.line;
+        const secondLines =
+            this.ranges[index.secondIndex].end.line -
+            this.ranges[index.secondIndex].start.line;
 
-        return {
-          rangeIndex: i,
-          start: {
-            lineOffset: sel.start.line - range.start.line,
-            character: sel.start.character
-          },
-          end: {
-            lineOffset: sel.end.line - range.start.line,
-            character: sel.end.character
-          }
-        };
-      }
-    }
-    return null;
-  }
+        const linesDiff = secondLines - firstLines;
 
-  private moveSelection(index: SwapRanges): boolean {
-    const secondIsUp = index.secondIndex < index.rangeIndex;
-    const mul = secondIsUp ? 0 : 1;
-
-    const firstLines =
-      this.ranges[index.rangeIndex].end.line -
-      this.ranges[index.rangeIndex].start.line;
-    const secondLines =
-      this.ranges[index.secondIndex].end.line -
-      this.ranges[index.secondIndex].start.line;
-
-    const linesDiff = secondLines - firstLines;
-
-    this.editor.selection = new Selection(
-      new Position(
-        this.ranges[index.secondIndex].start.line +
-          index.start.lineOffset +
-          mul * linesDiff,
-        index.start.character
-      ),
-      new Position(
-        this.ranges[index.secondIndex].start.line +
-          index.end.lineOffset +
-          mul * linesDiff,
-        index.end.character
-      )
-    );
-    return true;
-  }
-
-  private swapInternalRanges(sr: SwapRanges) {
-    let first = this.ranges[sr.rangeIndex];
-    let second = this.ranges[sr.secondIndex];
-    let switched = first.start.line > second.start.line;
-
-    if (switched) {
-      [first, second] = [second, first];
+        this.editor.selection = new Selection(
+            new Position(
+                this.ranges[index.secondIndex].start.line +
+                index.start.lineOffset +
+                mul * linesDiff,
+                index.start.character
+            ),
+            new Position(
+                this.ranges[index.secondIndex].start.line +
+                index.end.lineOffset +
+                mul * linesDiff,
+                index.end.character
+            )
+        );
+        return true;
     }
 
-    const firstNew = mutableRange(first);
-    const secondNew = mutableRange(second);
+    private swapInternalRanges(sr: ISwapRanges) {
+        let first = this.ranges[sr.rangeIndex];
+        let second = this.ranges[sr.secondIndex];
+        const switched = first.start.line > second.start.line;
 
-    const diffLines = second.start.line - first.start.line;
-    firstNew.start.line += diffLines;
-    firstNew.end.line += diffLines;
-    secondNew.start.line -= diffLines;
-    secondNew.end.line -= diffLines;
+        if (switched) {
+            [first, second] = [second, first];
+        }
 
-    this.ranges[switched ? sr.secondIndex : sr.rangeIndex] = rangeFromObject(
-      secondNew
-    );
-    this.ranges[switched ? sr.rangeIndex : sr.secondIndex] = rangeFromObject(
-      firstNew
-    );
-  }
+        const firstNew = mutableRange(first);
+        const secondNew = mutableRange(second);
 
-  private swapFunctions(sr: SwapRanges): Thenable<boolean> {
-    return this.editor.edit(edit => {
-      const firstText = this.document.getText(this.ranges[sr.rangeIndex]);
-      const secondText = this.document.getText(this.ranges[sr.secondIndex]);
+        const diffLines = second.start.line - first.start.line;
+        firstNew.start.line += diffLines;
+        firstNew.end.line += diffLines;
+        secondNew.start.line -= diffLines;
+        secondNew.end.line -= diffLines;
 
-      edit.replace(this.ranges[sr.rangeIndex], secondText);
-      edit.replace(this.ranges[sr.secondIndex], firstText);
-
-      this.swapInternalRanges(sr);
-    });
-  }
-
-  public moveUp(sel: Selection): Thenable<boolean> {
-    const index = this.getSelectionRangeIndex(sel);
-    if (this.ranges.length < 2 || !index) {
-      return Promise.resolve(false);
+        this.ranges[switched ? sr.secondIndex : sr.rangeIndex] = rangeFromObject(
+            secondNew
+        );
+        this.ranges[switched ? sr.rangeIndex : sr.secondIndex] = rangeFromObject(
+            firstNew
+        );
     }
 
-    if (index.rangeIndex > 0) {
-      const sr: SwapRanges = {
-        ...index,
-        secondIndex: index.rangeIndex - 1
-      };
-      return this.swapFunctions(sr).then(() => this.moveSelection(sr));
+    private swapFunctions(sr: ISwapRanges): Thenable<boolean> {
+        return this.editor.edit((edit) => {
+            const firstText = this.document.getText(this.ranges[sr.rangeIndex]);
+            const secondText = this.document.getText(this.ranges[sr.secondIndex]);
+
+            edit.replace(this.ranges[sr.rangeIndex], secondText);
+            edit.replace(this.ranges[sr.secondIndex], firstText);
+
+            this.swapInternalRanges(sr);
+        });
     }
-
-    return Promise.resolve(false);
-  }
-
-  public moveDown(sel: Selection): Thenable<boolean> {
-    const index = this.getSelectionRangeIndex(sel);
-    if (this.ranges.length < 2 || !index) {
-      return Promise.resolve(false);
-    }
-
-    if (index.rangeIndex < this.ranges.length - 1) {
-      const sr: SwapRanges = {
-        ...index,
-        secondIndex: index.rangeIndex + 1
-      };
-      return this.swapFunctions(sr).then(() => this.moveSelection(sr));
-    }
-
-    return Promise.resolve(false);
-  }
 }

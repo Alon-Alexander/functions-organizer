@@ -10,23 +10,25 @@ The plugin exposes a few actions, and it binds these to keyboard shortcuts:
 - Move function up (`control+shift+up`).
 - Move function down (`control+shit+up`).
 
+### Language Support
+
+A list of programming languages this plugin supports:
+
+- Javascript
+
 ## Requirements && Extension Settings
 
 No requirements nor extension settings for now.
 
-## Known Issues
-
-None :smiley:
-
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.1.0
+
+Add support for arrow functions (JavaScript).
 
 ### 0.0.1
 
 Writing the basics.
-
-Nothing is guarenteed to work and everything is WIP.
 
 -----------------------------------------------------------------------------------------------------------
 
@@ -34,6 +36,18 @@ Nothing is guarenteed to work and everything is WIP.
 
 This repository is under the [MIT license](LICENSE).
 
-# Contributions
+# TODO Section
+
+### JavaScript
+
+- [ ] Add LOTS of tests.
+- [x] Support in arrow functions.
+- [ ] Support for `export` keywork.
+- [ ] Support for function sort.
+- [ ] Support for classes.
+
+Which _language_ should come next? (I think to support JSON)
+
+# Contributors
 
 Created and maintained by [Alon Alexander](https://github.com/Alon-Alexander).

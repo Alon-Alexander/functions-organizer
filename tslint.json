@@ -2,6 +2,7 @@
   "extends": [
     "tslint:recommended",
     "tslint:config-standard",
+    "airbnb",
   ],
   "rules": {
     "no-string-throw": true,

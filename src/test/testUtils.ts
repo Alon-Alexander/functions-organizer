@@ -12,8 +12,8 @@ export enum ACTION {
 
 export interface TestMap {
   name: string;
-  returnValues: [boolean];
-  actions: [ACTION];
+  returnValue: boolean;
+  action: ACTION;
   beforeRange: {
     start: {
       line: number;

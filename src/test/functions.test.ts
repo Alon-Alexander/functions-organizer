@@ -1,16 +1,10 @@
-import * as assert from "assert";
-import * as vscode from "vscode";
-import * as path from "path";
-import { readFile, readFileSync, writeFileSync } from "fs";
-import FunctionMove from "../functions";
-import {
-    TestMap,
-    resolvePath,
-    setupDocument,
-    OUTPUT,
-    closeDocument,
-    ACTION
-} from "./testUtils";
+import { expect } from 'chai';
+import { readFile, readFileSync } from 'fs';
+import * as path from 'path';
+import * as vscode from 'vscode';
+
+import FunctionMove from '../functions';
+import { ACTION, closeDocument, OUTPUT, resolvePath, setupDocument, TestMap } from './testUtils';
 
 const testsMap: { tests: TestMap[] } = JSON.parse(
     String(
@@ -40,44 +34,39 @@ function getFile(prefix: string, filename: string): Thenable<string> {
 
 suite("Function Move Tests", function () {
     for (let i = 0; i < testsMap.tests.length; i++) {
-        test(`Move Up - Case ${i} (${testsMap.tests[i].name})`, async () => {
+        // if (i !== 5) continue;
+        test(`Case ${i} (${testsMap.tests[i].name})`, async () => {
             const test = testsMap.tests[i];
 
             const editor = await setupDocument(test);
 
             const fm = new FunctionMove(editor);
-            for (let j = 0; j < test.actions.length; j++) {
-                let returnValue: boolean | null;
-                switch (test.actions[j]) {
-                    case ACTION.UP:
-                        returnValue = await fm.moveUp(editor.selection);
-                        break;
-                    case ACTION.DOWN:
-                        returnValue = await fm.moveDown(editor.selection);
-                        break;
-                    default:
-                        returnValue = null;
-                }
-                assert.notEqual(returnValue, null, `Error in tests\' map file - invalid action on index ${j}`);
-                assert.equal(returnValue, test.returnValues[j], "returned value");
+            let returnValue: boolean | null;
+            switch (test.action) {
+                case ACTION.UP:
+                    returnValue = await fm.moveUp(editor.selection);
+                    break;
+                case ACTION.DOWN:
+                    returnValue = await fm.moveDown(editor.selection);
+                    break;
+                default:
+                    returnValue = null;
+            }
+            expect(returnValue).to.not.be.equal(null, `Error in tests\' map file - invalid action`);
+            expect(returnValue).to.be.equal(test.returnValue, `returned value`);
+
+            if (returnValue) {
+                const content = await getFile(OUTPUT, test.name);
+                expect(editor.document.getText()).to.equal(content, "content of file");
             }
 
-            writeFileSync(
-                resolvePath(OUTPUT, `output-${i}.js`),
-                editor.document.getText()
-            );
-            const content = await getFile(OUTPUT, test.name);
-            assert.equal(editor.document.getText(), content, "content of file");
-
             const after = test.afterRange;
-            assert.deepEqual(
-                editor.selection,
+            expect(editor.selection).to.deep.equal(
                 new vscode.Selection(
                     new vscode.Position(after.start.line, after.start.character),
-                    new vscode.Position(after.end.line, after.end.character)
-                ),
-                "selection in file"
-            );
+                    new vscode.Position(after.end.line, after.end.character)),
+                "selection in file",
+            )
             await closeDocument();
         });
     }

@@ -20,19 +20,15 @@ A list of programming languages this plugin supports:
 
 No requirements nor extension settings for now.
 
-## Known Issues
-
-None :smiley:
-
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.1.0
+
+Add support for arrow functions (JavaScript).
 
 ### 0.0.1
 
 Writing the basics.
-
-Nothing is guarenteed to work and everything is WIP.
 
 -----------------------------------------------------------------------------------------------------------
 
@@ -45,8 +41,8 @@ This repository is under the [MIT license](LICENSE).
 ### JavaScript
 
 - [ ] Add LOTS of tests.
-- [ ] Test combinations of actions and multiple actions.
-- [ ] Support in arrow functions.
+- [x] Support in arrow functions.
+- [ ] Support for `export` keywork.
 - [ ] Support for function sort.
 - [ ] Support for classes.
 

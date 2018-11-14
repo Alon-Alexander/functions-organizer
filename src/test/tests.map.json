@@ -2,76 +2,87 @@
   "tests": [
     {
       "name": "1.js",
-      "returnValues": [
-        true
-      ],
-      "actions": [
-        "UP"
-      ],
+      "returnValue": true,
+      "action": "UP",
       "beforeRange": {
         "start": {
-          "line": 12,
-          "character": 6
+          "line": 11,
+          "character": 5
         },
         "end": {
-          "line": 12,
-          "character": 10
+          "line": 11,
+          "character": 9
         }
       },
       "afterRange": {
         "start": {
-          "line": 5,
-          "character": 6
+          "line": 4,
+          "character": 5
         },
         "end": {
-          "line": 5,
-          "character": 10
+          "line": 4,
+          "character": 9
         }
       }
     },
     {
       "name": "1.js",
-      "returnValues": [
-        true
-      ],
-      "actions": [
-        "UP"
-      ],
+      "returnValue": true,
+      "action": "DOWN",
       "beforeRange": {
         "start": {
-          "line": 11,
-          "character": 25
+          "line": 4,
+          "character": 2
         },
         "end": {
-          "line": 11,
-          "character": 25
+          "line": 5,
+          "character": 1
         }
       },
       "afterRange": {
         "start": {
-          "line": 4,
-          "character": 25
+          "line": 12,
+          "character": 2
         },
         "end": {
-          "line": 4,
-          "character": 25
+          "line": 13,
+          "character": 1
+        }
+      }
+    },
+    {
+      "name": "1.js",
+      "returnValue": true,
+      "action": "UP",
+      "beforeRange": {
+        "start": {
+          "line": 10,
+          "character": 24
+        },
+        "end": {
+          "line": 10,
+          "character": 24
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 3,
+          "character": 24
+        },
+        "end": {
+          "line": 3,
+          "character": 24
         }
       }
     },
     {
       "name": "2.js",
-      "returnValues": [
-        true,
-        true
-      ],
-      "actions": [
-        "UP",
-        "UP"
-      ],
+      "returnValue": true,
+      "action": "UP",
       "beforeRange": {
         "start": {
-          "line": 17,
-          "character": 1
+          "line": 15,
+          "character": 0
         },
         "end": {
           "line": 17,
@@ -80,12 +91,112 @@
       },
       "afterRange": {
         "start": {
-          "line": 4,
+          "line": 9,
+          "character": 0
+        },
+        "end": {
+          "line": 11,
+          "character": 1
+        }
+      }
+    },
+    {
+      "name": "3.js",
+      "returnValue": true,
+      "action": "UP",
+      "beforeRange": {
+        "start": {
+          "line": 3,
+          "character": 4
+        },
+        "end": {
+          "line": 3,
+          "character": 4
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 1,
+          "character": 4
+        },
+        "end": {
+          "line": 1,
+          "character": 4
+        }
+      }
+    },
+    {
+      "name": "3.js",
+      "returnValue": false,
+      "action": "UP",
+      "beforeRange": {
+        "start": {
+          "line": 1,
           "character": 1
         },
         "end": {
-          "line": 4,
+          "line": 1,
           "character": 1
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 1,
+          "character": 1
+        },
+        "end": {
+          "line": 1,
+          "character": 1
+        }
+      }
+    },
+    {
+      "name": "3.js",
+      "returnValue": true,
+      "action": "DOWN",
+      "beforeRange": {
+        "start": {
+          "line": 0,
+          "character": 19
+        },
+        "end": {
+          "line": 0,
+          "character": 30
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 5,
+          "character": 19
+        },
+        "end": {
+          "line": 5,
+          "character": 30
+        }
+      }
+    },
+    {
+      "name": "4.js",
+      "returnValue": true,
+      "action": "DOWN",
+      "beforeRange": {
+        "start": {
+          "line": 1,
+          "character": 9
+        },
+        "end": {
+          "line": 1,
+          "character": 9
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 5,
+          "character": 9
+        },
+        "end": {
+          "line": 5,
+          "character": 9
         }
       }
     }

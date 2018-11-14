@@ -109,7 +109,7 @@ export default class FunctionMove {
 
     private moveSelection(index: ISwapRanges): boolean {
         const secondIsUp = index.secondIndex < index.rangeIndex;
-        const mul = secondIsUp ? 0 : 1;
+        const mul = secondIsUp ? 0 : -1;
 
         const firstLines =
             this.ranges[index.rangeIndex].end.line -

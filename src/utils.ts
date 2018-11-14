@@ -23,6 +23,16 @@ export function rangeFromObject(mr: MutableRange): vscode.Range {
     );
 }
 
+function advance(ip: IndexPosition, txt: string): void {
+    if (txt[ip.index] === "\n") {
+        ip.line++;
+        ip.character = 0;
+    } else {
+        ip.character++;
+    }
+    ip.index++;
+}
+
 export function findPositionAfterBrackets(txt: string, open: string, ip: IndexPosition): void {
     const CLOSE_MAP: { [key: string]: string } = {
         '(': ')',
@@ -34,18 +44,12 @@ export function findPositionAfterBrackets(txt: string, open: string, ip: IndexPo
 
     // Find opening bracket
     while (txt[ip.index] !== open) {
-        ip.index++;
-        if (txt[ip.index] === "\n") {
-            ip.line++;
-            ip.character = 0;
-        } else {
-            ip.character++;
-        }
+        advance(ip, txt);
     }
 
     // Find closing bracket
     let counter = 1;
-    for (ip.index++; counter > 0; ip.index++) {
+    for (advance(ip, txt); counter > 0 && ip.index < txt.length; advance(ip, txt)) {
         switch (txt[ip.index]) {
             case open:
                 counter++;
@@ -54,12 +58,6 @@ export function findPositionAfterBrackets(txt: string, open: string, ip: IndexPo
                 counter--;
                 break;
             default:
-        }
-        if (txt[ip.index] === "\n") {
-            ip.line++;
-            ip.character = 0;
-        } else {
-            ip.character++;
         }
     }
 }
@@ -70,13 +68,8 @@ export function getPositionFromIndex(
 ): IndexPosition {
     const ip = new IndexPosition(0, 0, 0);
 
-    for (; ip.index < index; ip.index++) {
-        if (txt[ip.index] === "\n") {
-            ip.line++;
-            ip.character = 0;
-        } else {
-            ip.character++;
-        }
+    while (ip.index < index) {
+        advance(ip, txt);
     }
 
     return ip;

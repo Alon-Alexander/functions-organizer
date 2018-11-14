@@ -1,14 +1,14 @@
 console.log("this is the begining");
 
-function anotherFunc({ obj: object }) {
-  obj["abc"] = "d";
+function func1(arg1, arg2) {
+  console.log(arg1);
+  arg1.print(arg2);
 }
 
 console.log("now");
 
-function func1(arg1, arg2) {
-  console.log(arg1);
-  arg1.print(arg2);
+function anotherFunc({ obj: object }) {
+  obj["abc"] = "d";
 }
 
 function func2() {

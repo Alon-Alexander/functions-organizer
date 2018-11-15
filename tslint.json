@@ -1,7 +1,6 @@
 {
   "extends": [
     "tslint:recommended",
-    "tslint:config-standard",
     "airbnb",
   ],
   "rules": {
@@ -22,6 +21,7 @@
     "no-bitwise": true,
     "triple-equals": true,
     "trailing-comma": true,
+    "prefer-const": true,
     "indent": [
       true,
       "spaces",

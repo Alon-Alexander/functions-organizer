@@ -1,6 +1,13 @@
 import { getDefaultRange, getPositionFromIndex } from '../utils';
 import { ACTION, IRange, readJSON, TestMap } from './testUtils';
 
+interface MaxObj {
+    maxStatement: number;
+    maxFunctions: number;
+    maxWhitespace: number;
+    maxNameLength: number;
+}
+
 export default class TestGenerator {
 
     private counter: number = 0;
@@ -8,14 +15,13 @@ export default class TestGenerator {
     private statements: (string | boolean)[][];
     private blocks: (string | boolean)[][];
     private functions: (string | boolean)[][];
+    private max: MaxObj;
 
     constructor(
         private random: (len: number) => number,
-        private maxFunctions: number,
-        private maxStatement: number,
-        private maxWhitespace: number,
-        private maxNameLength: number,
+        max: MaxObj,
     ) {
+        this.max = max;
         const data = readJSON('automated.data.json');
         this.expressions = data.expressions;
         this.statements = data.statements;
@@ -25,7 +31,7 @@ export default class TestGenerator {
 
     public generate(): TestMap {
         const size = (arr: string[]) => arr.reduce((p, n) => p + n.length, 0);
-        const amount = this.random(this.maxFunctions - 1) + 2;
+        const amount = this.randomWithMin(this.max.maxFunctions + 1, 2);
         const swapIndex = this.random(amount);
         let builderIn: string[] = [];
         let builderOut: string[] = [];
@@ -62,7 +68,7 @@ export default class TestGenerator {
                 const beforeIp = getPositionFromIndex(bInTxt, builderSize);
 
                 // Decide selection
-                const offset = this.random(size(first) - 3) + 1;
+                const offset = this.randomWithMin(size(first) - 2, 1);
                 const selectionSize = Math.max(0, this.random(size(first) - offset - 2));
 
                 // Create before range
@@ -165,14 +171,14 @@ export default class TestGenerator {
 
         let builder = "";
         builder += this.choose(alphabet);
-        for (let i = 0; i < this.random(this.maxNameLength); i++) {
+        for (let i = 0; i < this.random(this.max.maxNameLength); i++) {
             builder += this.choose(alphanumery);
         }
         return builder;
     }
 
     private generateStatementBlock = (): string[] => {
-        const amount = this.random(this.maxStatement + 1);
+        const amount = this.random(this.max.maxStatement + 1);
         const blockIndex = this.randomBoolean() ? this.random(amount) : -1;
         let builder: string[] = [];
 
@@ -199,15 +205,21 @@ export default class TestGenerator {
 
         for (let j = 0; j < comp.length; j++) {
             if (comp[j] === false) {
-                builder.push(falseGenerate());
-                builder.push(this.randomWhitespace(false, true));
+                builder.push(
+                    falseGenerate(),
+                    this.randomWhitespace(false, true),
+                );
             } else if (comp[j] === true) {
-                builder.push(this.randomWhitespace(true, true));
-                builder.push(...this.fillComplex(this.choose(this.statements), falseGenerate));
-                builder.push(this.randomWhitespace(true, true));
+                builder.push(
+                    this.randomWhitespace(true, true),
+                    ...this.fillComplex(this.choose(this.statements), falseGenerate),
+                    this.randomWhitespace(true, true),
+                );
             } else {
-                builder.push(String(comp[j]));
-                builder.push(this.randomWhitespace(false, false));
+                builder.push(
+                    String(comp[j]),
+                    this.randomWhitespace(false, false),
+                );
             }
         }
 
@@ -226,9 +238,13 @@ export default class TestGenerator {
         const wsInline = [' '];
         const wss = [...wsInline, '\n']
 
-        const amount: number = allowEmpty ? this.random(this.maxWhitespace + 1) : (this.random(this.maxWhitespace) + 1);
+        const amount: number = this.randomWithMin(this.max.maxWhitespace + 1, allowEmpty ? 0 : 1);
         const list = allowNewline ? wss : wsInline;
 
         return Array.from(Array(amount)).map(() => String(this.choose(list))).reduce((p, n) => p + n, '');
+    }
+
+    private randomWithMin(len: number, min: number) {
+        return this.random(len - min) + min;
     }
 }

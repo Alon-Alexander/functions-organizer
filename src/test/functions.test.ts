@@ -7,20 +7,25 @@ import { ACTION, closeDocument, getOutputContent, readJSON, setupDocument, TestM
 
 const testsMap: { tests: TestMap[] } = readJSON("tests.map.json");
 
-async function executeTest(test: TestMap) {
-    const editor = await setupDocument(test);
-    const fm = new FunctionMove(editor);
-    let returnValue: boolean | null;
-    switch (test.action) {
+async function performAction(fm: FunctionMove, action: ACTION, sel: vscode.Selection): Promise<boolean | null> {
+    let returnValue;
+    switch (action) {
         case ACTION.UP:
-            returnValue = await fm.moveUp(editor.selection);
+            returnValue = await fm.moveUp(sel);
             break;
         case ACTION.DOWN:
-            returnValue = await fm.moveDown(editor.selection);
+            returnValue = await fm.moveDown(sel);
             break;
         default:
             returnValue = null;
     }
+    return returnValue;
+}
+
+async function executeTest(test: TestMap) {
+    const editor = await setupDocument(test);
+    const fm = new FunctionMove(editor);
+    let returnValue: boolean | null = await performAction(fm, test.action, editor.selection);
     if (returnValue != test.returnValue) {
         process.exit(-1);
     }
@@ -45,10 +50,12 @@ async function executeTest(test: TestMap) {
 suite("Generated Tests", async () => {
     const tg = new TestGenerator(
         (len) => Math.floor(Math.random() * len),
-        4,
-        5,
-        3,
-        10,
+        {
+            maxStatement: 4,
+            maxFunctions: 5,
+            maxWhitespace: 3,
+            maxNameLength: 10,
+        },
     );
 
     const amount = 100;

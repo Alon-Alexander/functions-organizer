@@ -109,7 +109,7 @@ export default class FunctionMove {
 
     private moveSelection(index: ISwapRanges): boolean {
         const secondIsUp = index.secondIndex < index.rangeIndex;
-        const mul = secondIsUp ? 0 : -1;
+        const mul = secondIsUp ? 0 : 1;
 
         const firstLines =
             this.ranges[index.rangeIndex].end.line -
@@ -118,20 +118,24 @@ export default class FunctionMove {
             this.ranges[index.secondIndex].end.line -
             this.ranges[index.secondIndex].start.line;
 
-        const linesDiff = secondLines - firstLines;
+        const linesDiff = firstLines - secondLines;
+
+        const startCharDiff = this.ranges[index.rangeIndex].start.character -
+            this.ranges[index.secondIndex].start.character;
+        const endCharDiff = firstLines === 0 ? startCharDiff : 0;
 
         this.editor.selection = new Selection(
             new Position(
                 this.ranges[index.secondIndex].start.line +
                 index.start.lineOffset +
                 mul * linesDiff,
-                index.start.character
+                index.start.character + startCharDiff,
             ),
             new Position(
                 this.ranges[index.secondIndex].start.line +
                 index.end.lineOffset +
                 mul * linesDiff,
-                index.end.character
+                index.end.character + endCharDiff,
             )
         );
         return true;

@@ -18,4 +18,15 @@ export default class IndexPosition {
     public clone(): IndexPosition {
         return new IndexPosition(this.index, this.line, this.character);
     }
+
+    public advance(txt: string): void {
+        if (txt[this.index] === "\n") {
+            this.line++;
+            this.character = 0;
+        } else {
+            this.character++;
+        }
+        this.index++;
+    }
+
 }

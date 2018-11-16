@@ -274,6 +274,42 @@
           "character": 1
         }
       }
+    },
+    {
+      "name": "sort-1.js",
+      "returnValue": true,
+      "action": "SORT",
+      "beforeRange": {
+        "start": {
+          "line": 8,
+          "character": 17
+        },
+        "end": {
+          "line": 8,
+          "character": 17
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 8,
+          "character": 17
+        }
+      }
+    },
+    {
+      "name": "sort-2.js",
+      "returnValue": true,
+      "action": "SORT",
+      "beforeRange": {
+        "start": {
+          "line": 2,
+          "character": 0
+        },
+        "end": {
+          "line": 13,
+          "character": 0
+        }
+      }
     }
   ]
 }

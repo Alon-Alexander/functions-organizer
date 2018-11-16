@@ -9,6 +9,7 @@ export const OUTPUT = "output/";
 export enum ACTION {
     UP = 'UP',
     DOWN = 'DOWN',
+    SORT = 'SORT',
 };
 
 export interface IRange {

@@ -59,3 +59,10 @@ const defaultRange = new vscode.Range(
 export function getDefaultRange() {
     return defaultRange;
 }
+
+export function getValueFromRegexArr(arr: RegExpExecArray, indices: number[]): string {
+    for (let i = 0; i < indices.length; i++)
+        if (arr[indices[i]])
+            return arr[indices[i]];
+    return '';
+}

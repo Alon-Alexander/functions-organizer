@@ -2,10 +2,9 @@ import { Position, Selection, TextDocument, TextEditor } from 'vscode';
 
 import consts from './consts';
 import DocumentFunction from './documentFunction';
-import { ISwapRanges, RegexObject, ISwapFunctions, IFunctionSelection, IFunctionSelectionSwitch } from './interfaces';
-import re from './regex';
-import { rangeFromObject } from './utils';
+import { IFunctionSelection, ISwapFunctions, ISwapRanges, RegexObject } from './interfaces';
 import MutableRange from './mutableRange';
+import re from './regex';
 
 
 export default class FunctionMove {
@@ -89,7 +88,7 @@ export default class FunctionMove {
         if ((!sel) || sel.isEmpty) {
             sel = new Selection(
                 this.document.positionAt(0),
-                this.document.positionAt(this.document.getText().length - 1),
+                this.document.positionAt(this.document.getText().length),
             );
         }
 

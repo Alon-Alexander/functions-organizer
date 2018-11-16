@@ -1,6 +1,6 @@
 import { Range } from "vscode";
 import { RegexObject } from "./interfaces";
-import { getPositionFromIndex, findPositionAfterBrackets } from "./utils";
+import { getPositionFromIndex, findPositionAfterBrackets, getValueFromRegexArr } from "./utils";
 import IndexPosition from "./indexPosition";
 
 export default class DocumentFunction {
@@ -17,7 +17,7 @@ export default class DocumentFunction {
         this.getClosingBracketPosition(txt, end);
         this._range = new Range(start.position, end.position);
 
-        this._name = arr[regObj.nameIndex]
+        this._name = getValueFromRegexArr(arr, regObj.nameIndices)
         this._index = index;
     }
 

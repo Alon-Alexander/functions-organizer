@@ -29,5 +29,5 @@ export interface ISwapFunctions {
 export interface RegexObject {
     reg: RegExp;
     allIndex: number;
-    nameIndices: [number];
+    nameIndices: number[];
 }

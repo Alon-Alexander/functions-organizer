@@ -1,11 +1,12 @@
 import { expect } from 'chai';
 import * as vscode from 'vscode';
 
-import FunctionMove from '../functions';
+import FunctionMove from '../functionMove';
 import TestGenerator from './automated';
 import { ACTION, closeDocument, getOutputContent, readJSON, setupDocument, TestMap } from './testUtils';
 
 const testsMap: { tests: TestMap[] } = readJSON("tests.map.json");
+const GENERATED_AMOUNT = 10;
 
 async function performAction(fm: FunctionMove, action: ACTION, sel: vscode.Selection): Promise<boolean | null> {
     let returnValue;
@@ -58,9 +59,7 @@ suite("Generated Tests", async () => {
         },
     );
 
-    const amount = 100;
-
-    for (let i = 0; i < amount; i++) {
+    for (let i = 0; i < GENERATED_AMOUNT; i++) {
         const gen = tg.generate();
         await test(gen.name, () => executeTest(gen));
     }

@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import FunctionMove from "./functions";
+import FunctionMove from "./functionMove";
 
 function getFmAndEditor(): {
     editor: vscode.TextEditor | null;
@@ -50,6 +50,15 @@ export function activate(context: vscode.ExtensionContext) {
             const { fm, editor } = getFmAndEditor();
             if (!!fm && !!editor) {
                 fm.moveDown(editor.selection);
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand("extension.sortFunctions", () => {
+            const { fm, editor } = getFmAndEditor();
+            if (!!fm && !!editor) {
+                fm.sort(editor.selection);
             }
         })
     );

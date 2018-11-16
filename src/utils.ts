@@ -1,20 +1,7 @@
 import * as vscode from 'vscode';
 
-import { MutableRange } from './interfaces';
 import IndexPosition from './indexPosition';
-
-export function mutableRange(p: vscode.Range): MutableRange {
-    return {
-        start: {
-            line: p.start.line,
-            character: p.start.character
-        },
-        end: {
-            line: p.end.line,
-            character: p.end.character
-        }
-    };
-}
+import MutableRange from './mutableRange';
 
 export function rangeFromObject(mr: MutableRange): vscode.Range {
     return new vscode.Range(
@@ -71,4 +58,11 @@ const defaultRange = new vscode.Range(
 );
 export function getDefaultRange() {
     return defaultRange;
+}
+
+export function getValueFromRegexArr(arr: RegExpExecArray, indices: number[]): string {
+    for (let i = 0; i < indices.length; i++)
+        if (arr[indices[i]])
+            return arr[indices[i]];
+    return '';
 }

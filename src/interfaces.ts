@@ -1,31 +1,33 @@
-export interface IRangeAndOffset {
-    rangeIndex: number;
+import DocumentFunction from "./documentFunction";
+
+export interface IFunctionSelection {
+    functionIndex: number;
     start: {
-        lineOffset: number;
+        line: number;
         character: number;
-    };
+    },
     end: {
-        lineOffset: number;
+        line: number;
         character: number;
     };
 }
 
-export interface ISwapRanges extends IRangeAndOffset {
+export interface IFunctionSelectionSwitch extends IFunctionSelection {
     secondIndex: number;
 }
 
-export interface MutableRange {
-    start: {
-        line: number;
-        character: number;
-    };
-    end: {
-        line: number;
-        character: number;
-    };
+export interface ISwapRanges {
+    firstIndex: number;
+    secondIndex: number;
+}
+
+export interface ISwapFunctions {
+    first: DocumentFunction;
+    second: DocumentFunction;
 }
 
 export interface RegexObject {
     reg: RegExp;
-    index: number;
+    allIndex: number;
+    nameIndices: number[];
 }

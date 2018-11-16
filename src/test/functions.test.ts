@@ -1,11 +1,12 @@
 import { expect } from 'chai';
 import * as vscode from 'vscode';
 
-import FunctionMove from '../functions';
+import FunctionMove from '../functionMove';
 import TestGenerator from './automated';
 import { ACTION, closeDocument, getOutputContent, readJSON, setupDocument, TestMap } from './testUtils';
 
 const testsMap: { tests: TestMap[] } = readJSON("tests.map.json");
+const GENERATED_AMOUNT = 100;
 
 async function performAction(fm: FunctionMove, action: ACTION, sel: vscode.Selection): Promise<boolean | null> {
     let returnValue;
@@ -15,6 +16,9 @@ async function performAction(fm: FunctionMove, action: ACTION, sel: vscode.Selec
             break;
         case ACTION.DOWN:
             returnValue = await fm.moveDown(sel);
+            break;
+        case ACTION.SORT:
+            returnValue = await fm.sort(sel);
             break;
         default:
             returnValue = null;
@@ -37,13 +41,15 @@ async function executeTest(test: TestMap) {
         expect(editor.document.getText()).to.equal(content, "content of file");
     }
 
-    const after = test.afterRange;
-    expect(editor.selection).to.deep.equal(
-        new vscode.Selection(
-            new vscode.Position(after.start.line, after.start.character),
-            new vscode.Position(after.end.line, after.end.character)),
-        "selection in file",
-    )
+    if (test.action !== ACTION.SORT) {
+        const after = test.afterRange;
+        expect(editor.selection).to.deep.equal(
+            new vscode.Selection(
+                new vscode.Position(after.start.line, after.start.character),
+                new vscode.Position(after.end.line, after.end.character)),
+            "selection in file",
+        )
+    }
     await closeDocument();
 }
 
@@ -58,9 +64,7 @@ suite("Generated Tests", async () => {
         },
     );
 
-    const amount = 100;
-
-    for (let i = 0; i < amount; i++) {
+    for (let i = 0; i < GENERATED_AMOUNT; i++) {
         const gen = tg.generate();
         await test(gen.name, () => executeTest(gen));
     }

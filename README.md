@@ -22,6 +22,10 @@ No requirements nor extension settings for now.
 
 ## Release Notes
 
+### 0.3.0
+
+Add support for sorting functions, either in selection or entire document ([Issue #5](https://github.com/Alon-Alexander/functions-organizer/issues/5))
+
 ### 0.2.0
 
 Add support for the `export` keyword ([Issue #4](https://github.com/Alon-Alexander/functions-organizer/issues/4));

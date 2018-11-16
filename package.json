@@ -2,7 +2,7 @@
   "name": "functions-organizer",
   "displayName": "Functions Organizer",
   "description": "An extension to move and organize functions in a file using shortcuts instead cut-paste.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "alon008",
   "engines": {
     "vscode": "^1.28.0"

@@ -1,16 +1,16 @@
-import { readFileSync, readFile } from 'fs';
-import * as path from 'path';
-import * as vscode from 'vscode';
+import { readFile, readFileSync } from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
 
 const FOLDER = "src/test/data/";
 const INPUT = "input/";
 export const OUTPUT = "output/";
 
 export enum ACTION {
-    UP = 'UP',
-    DOWN = 'DOWN',
-    SORT = 'SORT',
-};
+    UP = "UP",
+    DOWN = "DOWN",
+    SORT = "SORT",
+}
 
 export interface IRange {
     start: {
@@ -23,7 +23,7 @@ export interface IRange {
     };
 }
 
-export interface TestMap {
+export interface ITestMap {
     name: string;
     isGenerated?: boolean;
     beforeContent?: string;
@@ -43,18 +43,18 @@ export const resolvePath = (prefix: string, filename: string): string =>
         filename
     );
 
-export async function setupDocument(test: TestMap): Promise<vscode.TextEditor> {
+export async function setupDocument(test: ITestMap): Promise<vscode.TextEditor> {
     let editor;
     if (test.isGenerated) {
         editor = await vscode.workspace.openTextDocument({
-            language: test.language,
             content: test.beforeContent,
-        }).then(doc => {
+            language: test.language,
+        }).then((doc) => {
             return vscode.window.showTextDocument(doc);
-        })
+        });
     } else {
-        let openPath = vscode.Uri.file(resolvePath(INPUT, test.name));
-        editor = await vscode.workspace.openTextDocument(openPath).then(doc => {
+        const openPath = vscode.Uri.file(resolvePath(INPUT, test.name));
+        editor = await vscode.workspace.openTextDocument(openPath).then((doc) => {
             return vscode.window.showTextDocument(doc);
         });
     }
@@ -71,7 +71,7 @@ export function closeDocument(): Thenable<{} | undefined> {
     return vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 }
 
-export function getOutputContent(test: TestMap): Thenable<string> {
+export function getOutputContent(test: ITestMap): Thenable<string> {
     if (test.isGenerated) {
         return Promise.resolve(test.afterContent || "");
     } else {

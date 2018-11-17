@@ -1,14 +1,25 @@
-import { expect } from 'chai';
-import * as vscode from 'vscode';
+import { expect } from "chai";
+import * as vscode from "vscode";
 
-import FunctionMove from '../functionMove';
-import TestGenerator from './automated';
-import { ACTION, closeDocument, getOutputContent, readJSON, setupDocument, TestMap } from './testUtils';
+import FunctionMove from "../functionMove";
+import TestGenerator from "./automated";
+import {
+    ACTION,
+    closeDocument,
+    getOutputContent,
+    ITestMap,
+    readJSON,
+    setupDocument,
+} from "./testUtils";
 
-const testsMap: { tests: TestMap[] } = readJSON("tests.map.json");
+const testsMap: { tests: ITestMap[] } = readJSON("tests.map.json");
 const GENERATED_AMOUNT = 100;
 
-async function performAction(fm: FunctionMove, action: ACTION, sel: vscode.Selection): Promise<boolean | null> {
+async function performAction(
+    fm: FunctionMove,
+    action: ACTION,
+    sel: vscode.Selection
+): Promise<boolean | null> {
     let returnValue;
     switch (action) {
         case ACTION.UP:
@@ -26,11 +37,11 @@ async function performAction(fm: FunctionMove, action: ACTION, sel: vscode.Selec
     return returnValue;
 }
 
-async function executeTest(test: TestMap) {
+async function executeTest(test: ITestMap) {
     const editor = await setupDocument(test);
     const fm = new FunctionMove(editor);
-    let returnValue: boolean | null = await performAction(fm, test.action, editor.selection);
-    if (returnValue != test.returnValue) {
+    const returnValue: boolean | null = await performAction(fm, test.action, editor.selection);
+    if (returnValue !== test.returnValue) {
         process.exit(-1);
     }
     expect(returnValue).to.not.be.equal(null, `Error in tests\' map file - invalid action`);
@@ -48,7 +59,7 @@ async function executeTest(test: TestMap) {
                 new vscode.Position(after.start.line, after.start.character),
                 new vscode.Position(after.end.line, after.end.character)),
             "selection in file",
-        )
+        );
     }
     await closeDocument();
 }
@@ -57,10 +68,10 @@ suite("Generated Tests", async () => {
     const tg = new TestGenerator(
         (len) => Math.floor(Math.random() * len),
         {
-            maxStatement: 4,
             maxFunctions: 5,
-            maxWhitespace: 3,
             maxNameLength: 10,
+            maxStatement: 4,
+            maxWhitespace: 3,
         },
     );
 
@@ -68,7 +79,7 @@ suite("Generated Tests", async () => {
         const gen = tg.generate();
         await test(gen.name, () => executeTest(gen));
     }
-})
+});
 
 suite("Written Tests", async () => {
     for (let i = 0; i < testsMap.tests.length; i++) {

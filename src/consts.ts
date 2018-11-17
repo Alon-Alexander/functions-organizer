@@ -1,4 +1,4 @@
 export default {
-    JAVASCRIPT: 'javascript',
-    FUNCTION: 'function',
+    FUNCTION: "function",
+    JAVASCRIPT: "javascript",
 };

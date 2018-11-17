@@ -5,7 +5,7 @@ export interface IFunctionSelection {
     start: {
         line: number;
         character: number;
-    },
+    };
     end: {
         line: number;
         character: number;
@@ -26,7 +26,7 @@ export interface ISwapFunctions {
     second: DocumentFunction;
 }
 
-export interface RegexObject {
+export interface IRegexObject {
     reg: RegExp;
     allIndex: number;
     nameIndices: number[];

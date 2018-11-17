@@ -1,38 +1,47 @@
 {
+  "defaultSeverity": "warning",
   "extends": [
-    "tslint:recommended",
-    "airbnb",
+    "tslint:recommended"
   ],
+  "linterOptions": {
+    "exclude": [
+      "src/test/data/**/*.*"
+    ]
+  },
   "rules": {
+    "class-name": true,
+    "curly": true,
+    "eofline": true,
+    "indent": [
+      true,
+      "spaces",
+      4
+    ],
+    "max-line-length": {
+      "options": {
+        "limit": 100
+      }
+    },
+    "no-bitwise": true,
+    "no-duplicate-variable": true,
+    "no-empty": true,
+    "no-require-imports": true,
     "no-string-throw": true,
     "no-unused-expression": true,
-    "no-duplicate-variable": true,
-    "curly": true,
-    "class-name": true,
+    "no-var-keyword": true,
+    "object-literal-sort-keys": true,
+    "ordered-imports": true,
+    "prefer-const": true,
+    "prefer-for-of": false,
+    "prefer-template": true,
     "semicolon": [
       true,
       "always"
     ],
-    "ordered-imports": true,
-    "object-literal-sort-keys": true,
-    "prefer-template": true,
-    "no-empty": true,
-    "no-var-keyword": true,
-    "no-bitwise": true,
-    "triple-equals": true,
     "trailing-comma": true,
-    "prefer-const": true,
-    "indent": [
-      true,
-      "spaces",
-      4,
-    ],
-    "eofline": true,
-  },
-  "defaultSeverity": "warning",
-  "linterOptions": {
-    "exclude": [
-      "src/test/data/**/*.*",
-    ]
+    "triple-equals": true,
+    "variable-name": {
+      "options": "allow-leading-underscore"
+    }
   }
 }

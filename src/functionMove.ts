@@ -1,11 +1,10 @@
-import { Position, Selection, TextDocument, TextEditor } from 'vscode';
+import { Position, Selection, TextDocument, TextEditor } from "vscode";
 
-import consts from './consts';
-import DocumentFunction from './documentFunction';
-import { IFunctionSelection, ISwapFunctions, ISwapRanges, RegexObject } from './interfaces';
-import MutableRange from './mutableRange';
-import re from './regex';
-
+import consts from "./consts";
+import DocumentFunction from "./documentFunction";
+import { IFunctionSelection, IRegexObject, ISwapFunctions, ISwapRanges } from "./interfaces";
+import MutableRange from "./mutableRange";
+import re from "./regex";
 
 export default class FunctionMove {
     private txt: string = "";
@@ -70,20 +69,23 @@ export default class FunctionMove {
     }
 
     public async sort(sel: Selection): Promise<boolean> {
-        const getSortedAndFunctions: () => { functions: DocumentFunction[], sorted: DocumentFunction[] } = () => {
-            let functions = this.functions.filter((func) => sel.contains(func.range));
+        const getSortedAndFunctions: () => {
+            functions: DocumentFunction[],
+            sorted: DocumentFunction[]
+        } = () => {
+            const funcs = this.functions.filter((func) => sel.contains(func.range));
 
-            let sorted = functions.slice(0);
-            sorted.sort((funcA, funcB) => {
-                if (funcA.name < funcB.name) return -1;
-                if (funcA.name > funcB.name) return 1;
+            const sortedFuncs = funcs.slice(0);
+            sortedFuncs.sort((funcA, funcB) => {
+                if (funcA.name < funcB.name) { return -1; }
+                if (funcA.name > funcB.name) { return 1; }
                 return 0;
             });
             return {
-                functions,
-                sorted,
-            }
-        }
+                functions: funcs,
+                sorted: sortedFuncs,
+            };
+        };
 
         if ((!sel) || sel.isEmpty) {
             sel = new Selection(
@@ -102,7 +104,7 @@ export default class FunctionMove {
                 });
 
                 this.init();
-                let saf = getSortedAndFunctions();
+                const saf = getSortedAndFunctions();
                 functions = saf.functions;
                 sorted = saf.sorted;
             }
@@ -116,7 +118,7 @@ export default class FunctionMove {
     }
 
     private initFunctions(): void {
-        const regObj: RegexObject = re[this.language][this.regType];
+        const regObj: IRegexObject = re[this.language][this.regType];
         this.functions = [];
 
         let arr = regObj.reg.exec(this.txt);
@@ -134,14 +136,14 @@ export default class FunctionMove {
                 const range = this.functions[i].range;
 
                 return {
+                    end: {
+                        character: sel.end.character,
+                        line: sel.end.line - range.start.line,
+                    },
                     functionIndex: i,
                     start: {
-                        line: sel.start.line - range.start.line,
                         character: sel.start.character,
-                    },
-                    end: {
-                        line: sel.end.line - range.start.line,
-                        character: sel.end.character,
+                        line: sel.start.line - range.start.line,
                     },
                 };
             }
@@ -180,7 +182,9 @@ export default class FunctionMove {
         const firstCopy = first.range;
         const secondRange = MutableRange.fromRange(second.range);
 
-        firstRange.start.line = secondRange.start.line + MutableRange.linesAmount(secondRange) - MutableRange.linesAmount(firstRange);
+        firstRange.start.line = secondRange.start.line +
+            MutableRange.linesAmount(secondRange)
+            - MutableRange.linesAmount(firstRange);
         firstRange.end.line = secondRange.end.line;
 
         secondRange.shiftLines(firstCopy.start.line - secondRange.start.line);

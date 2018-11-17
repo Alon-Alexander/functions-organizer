@@ -1,7 +1,7 @@
-import { getDefaultRange, getPositionFromIndex } from '../utils';
-import { ACTION, IRange, readJSON, TestMap } from './testUtils';
+import { getDefaultRange, getPositionFromIndex } from "../utils";
+import { ACTION, IRange, ITestMap, readJSON } from "./testUtils";
 
-interface MaxObj {
+interface IMaxObj {
     maxStatement: number;
     maxFunctions: number;
     maxWhitespace: number;
@@ -12,29 +12,29 @@ export default class TestGenerator {
 
     private counter: number = 0;
     private expressions: string[];
-    private statements: (string | boolean)[][];
-    private blocks: (string | boolean)[][];
-    private functions: (string | boolean)[][];
-    private max: MaxObj;
+    private statements: Array<Array<string | boolean>>;
+    private blocks: Array<Array<string | boolean>>;
+    private functions: Array<Array<string | boolean>>;
+    private max: IMaxObj;
 
     constructor(
         private random: (len: number) => number,
-        max: MaxObj,
+        max: IMaxObj,
     ) {
         this.max = max;
-        const data = readJSON('automated.data.json');
+        const data = readJSON("automated.data.json");
         this.expressions = data.expressions;
         this.statements = data.statements;
         this.blocks = data.blocks;
         this.functions = data.functions;
     }
 
-    public generate(): TestMap {
+    public generate(): ITestMap {
         const size = (arr: string[]) => arr.reduce((p, n) => p + n.length, 0);
         const amount = this.randomWithMin(this.max.maxFunctions + 1, 2);
         const swapIndex = this.random(amount);
-        let builderIn: string[] = [];
-        let builderOut: string[] = [];
+        const builderIn: string[] = [];
+        const builderOut: string[] = [];
 
         let beforeRange: IRange = getDefaultRange();
         let afterRange: IRange = getDefaultRange();
@@ -64,7 +64,7 @@ export default class TestGenerator {
                 builderIn.push(wsFirst, ...first);
                 builderOut.push(wsSecond, ...second);
 
-                const bInTxt = builderIn.join('');
+                const bInTxt = builderIn.join("");
                 const beforeIp = getPositionFromIndex(bInTxt, builderSize);
 
                 // Decide selection
@@ -72,17 +72,17 @@ export default class TestGenerator {
                 const selectionSize = Math.max(0, this.random(size(first) - offset - 2));
 
                 // Create before range
-                for (let i = 0; i < offset; i++) {
-                    beforeIp.advance(bInTxt);
+                for (let j = 0; j < offset; j++) {
+                    beforeIp.advance();
                 }
                 const beforeEnd = beforeIp.clone();
-                for (let i = 0; i < selectionSize; i++) {
-                    beforeEnd.advance(bInTxt);
+                for (let j = 0; j < selectionSize; j++) {
+                    beforeEnd.advance();
                 }
 
                 beforeRange = {
-                    start: beforeIp.position,
                     end: beforeEnd.position,
+                    start: beforeIp.position,
                 };
 
                 // Generate and append mid-block
@@ -96,22 +96,22 @@ export default class TestGenerator {
                 builderOut.push(wsFirst, ...first);
 
                 // Create after range
-                const bOutTxt = builderOut.join('');
+                const bOutTxt = builderOut.join("");
                 const afterIp = getPositionFromIndex(bOutTxt, builderSize);
-                for (let i = 0; i < offset; i++) {
-                    afterIp.advance(bOutTxt);
+                for (let j = 0; j < offset; j++) {
+                    afterIp.advance();
                 }
                 const afterEnd = afterIp.clone();
-                for (let i = 0; i < selectionSize; i++) {
-                    afterEnd.advance(bOutTxt);
+                for (let j = 0; j < selectionSize; j++) {
+                    afterEnd.advance();
                 }
 
                 afterRange = {
-                    start: afterIp,
                     end: afterEnd,
+                    start: afterIp,
                 };
 
-                i++
+                i++;
             } else {
                 func = [this.randomWhitespace(true, true), ...this.generateFunction()];
 
@@ -123,8 +123,8 @@ export default class TestGenerator {
             builderOut.push(...block);
         }
 
-        let beforeContent = builderIn.join('');
-        let afterContent = builderOut.join('');
+        let beforeContent = builderIn.join("");
+        let afterContent = builderOut.join("");
 
         // Decide whether action is UP or DOWN
         let action: ACTION;
@@ -137,26 +137,26 @@ export default class TestGenerator {
         }
 
         return {
-            name: `Generated ${this.counter++}`,
-            isGenerated: true,
-            beforeContent,
-            afterContent,
-            language: 'javascript',
-            returnValue: true,
             action,
-            beforeRange,
+            afterContent,
             afterRange,
+            beforeContent,
+            beforeRange,
+            isGenerated: true,
+            language: "javascript",
+            name: `Generated ${this.counter++}`,
+            returnValue: true,
         };
     }
 
     private generateFunction = (): string[] => {
-        let builder: string[] = [];
+        const builder: string[] = [];
         const func = this.choose(this.functions);
 
         builder.push(...this.fillComplex(func, this.generateName));
-        builder.push("{")
+        builder.push("{");
         builder.push(...this.generateStatementBlock());
-        builder.push("}")
+        builder.push("}");
 
         if (func[0] !== "funcion") {
             builder.push(";\n");
@@ -166,8 +166,8 @@ export default class TestGenerator {
     }
 
     private generateName = (): string => {
-        const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
-        const alphanumery: string[] = [...alphabet, ...'1234567890'.split('')]
+        const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+        const alphanumery: string[] = [...alphabet, ..."1234567890".split("")];
 
         let builder = "";
         builder += this.choose(alphabet);
@@ -180,7 +180,7 @@ export default class TestGenerator {
     private generateStatementBlock = (): string[] => {
         const amount = this.random(this.max.maxStatement + 1);
         const blockIndex = this.randomBoolean() ? this.random(amount) : -1;
-        let builder: string[] = [];
+        const builder: string[] = [];
 
         let block;
         for (let i = 0; i < amount; i++) {
@@ -200,7 +200,10 @@ export default class TestGenerator {
         return builder;
     }
 
-    private fillComplex = (comp: (string | boolean)[], falseGenerate: () => string): string[] => {
+    private fillComplex = (
+        comp: Array<string | boolean>,
+        falseGenerate: () => string,
+    ): string[] => {
         const builder: string[] = [];
 
         for (let j = 0; j < comp.length; j++) {
@@ -235,13 +238,15 @@ export default class TestGenerator {
     }
 
     private randomWhitespace = (allowNewline: boolean, allowEmpty: boolean): string => {
-        const wsInline = [' '];
-        const wss = [...wsInline, '\n']
+        const wsInline = [" "];
+        const wss = [...wsInline, "\n"];
 
         const amount: number = this.randomWithMin(this.max.maxWhitespace + 1, allowEmpty ? 0 : 1);
         const list = allowNewline ? wss : wsInline;
 
-        return Array.from(Array(amount)).map(() => String(this.choose(list))).reduce((p, n) => p + n, '');
+        return Array.from(Array(amount))
+            .map(() => String(this.choose(list)))
+            .reduce((p, n) => p + n, "");
     }
 
     private randomWithMin(len: number, min: number) {

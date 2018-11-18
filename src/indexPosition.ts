@@ -1,14 +1,14 @@
-import { Position } from 'vscode';
+import { Position } from "vscode";
 
 /**
  * A position in a document.
  * Holds both a vscode.Position and an index.
  */
 export default class IndexPosition {
-    private txt: string;
     public index: number;
     public line: number;
     public character: number;
+    private txt: string;
 
     constructor(txt: string, index: number, line: number, character: number) {
         this.txt = txt;

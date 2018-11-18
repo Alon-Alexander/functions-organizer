@@ -6,7 +6,7 @@ import { IFunctionSelection, IRegexObject, ISwapFunctions, ISwapRanges } from ".
 import MutableRange from "./mutableRange";
 import re from "./regex";
 
-export default class FunctionMove {
+export default class Organizer {
     private txt: string = "";
     private editor: TextEditor;
     private document: TextDocument;

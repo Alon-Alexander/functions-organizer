@@ -1,53 +1,51 @@
 "use strict";
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import FunctionMove from "./functionMove";
+import Organizer from "./organizer";
 
-function getFmAndEditor(): {
+function getOrganizerAndEditor(): {
     editor: vscode.TextEditor | null;
-    fm: FunctionMove | null;
+    organizer: Organizer | null;
 } {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
         return {
             editor: null,
-            fm: null
+            organizer: null
         }; // No open text editor
     }
 
-    const fm = new FunctionMove(editor);
+    const organizer = new Organizer(editor);
 
     return {
         editor,
-        fm
+        organizer
     };
 }
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand("extension.moveFunctionUp", () => {
-            const { fm, editor } = getFmAndEditor();
-            if (!!fm && !!editor) {
-                fm.moveUp(editor.selection);
+            const { organizer, editor } = getOrganizerAndEditor();
+            if (!!organizer && !!editor) {
+                organizer.moveUp(editor.selection);
             }
         })
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand("extension.moveFunctionDown", () => {
-            const { fm, editor } = getFmAndEditor();
-            if (!!fm && !!editor) {
-                fm.moveDown(editor.selection);
+            const { organizer, editor } = getOrganizerAndEditor();
+            if (!!organizer && !!editor) {
+                organizer.moveDown(editor.selection);
             }
         })
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand("extension.sortFunctions", () => {
-            const { fm, editor } = getFmAndEditor();
-            if (!!fm && !!editor) {
-                fm.sort(editor.selection);
+            const { organizer, editor } = getOrganizerAndEditor();
+            if (!!organizer && !!editor) {
+                organizer.sort(editor.selection);
             }
         })
     );

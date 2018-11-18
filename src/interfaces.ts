@@ -1,4 +1,11 @@
+import { Selection } from "vscode";
 import DocumentFunction from "./documentFunction";
+
+export interface IOrganizable {
+    moveUp: (sel: Selection) => Promise<boolean>;
+    moveDown: (sel: Selection) => Promise<boolean>;
+    sort: (sel: Selection) => Promise<boolean>;
+}
 
 export interface IFunctionSelection {
     functionIndex: number;

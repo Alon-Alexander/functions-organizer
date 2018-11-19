@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import * as vscode from "vscode";
 
-import FunctionMove from "../functionMove";
+import Organizer from "../organizer";
 import TestGenerator from "./automated";
 import {
     ACTION,
@@ -16,7 +16,7 @@ const testsMap: { tests: ITestMap[] } = readJSON("tests.map.json");
 const GENERATED_AMOUNT = 100;
 
 async function performAction(
-    fm: FunctionMove,
+    fm: Organizer,
     action: ACTION,
     sel: vscode.Selection
 ): Promise<boolean | null> {
@@ -39,8 +39,10 @@ async function performAction(
 
 async function executeTest(test: ITestMap) {
     const editor = await setupDocument(test);
-    const fm = new FunctionMove(editor);
-    const returnValue: boolean | null = await performAction(fm, test.action, editor.selection);
+    const organizer = new Organizer(editor);
+    const returnValue: boolean | null = await performAction(
+        organizer, test.action, editor.selection
+    );
     if (returnValue !== test.returnValue) {
         process.exit(-1);
     }

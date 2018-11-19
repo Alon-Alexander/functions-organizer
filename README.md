@@ -9,6 +9,7 @@ The plugin exposes a few actions, and it binds these to keyboard shortcuts:
 
 - Move function up (`control+shift+up`).
 - Move function down (`control+shit+up`).
+- Sort functions in a selection (or entire document/class if no are is selected).
 
 ### Language Support
 
@@ -21,6 +22,15 @@ A list of programming languages this plugin supports:
 No requirements nor extension settings for now.
 
 ## Release Notes
+
+### 1.0.0
+
+First major release. Enough functionality available for casual use and productivity from the extension.
+
+Support only for the JavaScript language.
+
+- [Add] Support for JS classes.
+
 
 ### 0.3.0
 

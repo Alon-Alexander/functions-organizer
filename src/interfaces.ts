@@ -30,4 +30,5 @@ export interface IRegexObject {
     reg: RegExp;
     allIndex: number;
     nameIndices: number[];
+    skipIndex: number;
 }

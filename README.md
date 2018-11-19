@@ -1,4 +1,4 @@
-# WIP: Functions Organizer
+# Functions Organizer
 
 A plugin which adds the ability to move functions around the file and swith them (like you can already do with single lines).<br>
 This ability helps to reformat and organize your code.

@@ -365,6 +365,61 @@
           "character": 5
         }
       }
+    },
+    {
+      "name": "1.java",
+      "returnValue": true,
+      "action": "UP",
+      "beforeRange": {
+        "start": {
+          "line": 7,
+          "character": 4
+        },
+        "end": {
+          "line": 7,
+          "character": 10
+        }
+      },
+      "afterRange": {
+        "start": {
+          "line": 3,
+          "character": 4
+        },
+        "end": {
+          "line": 3,
+          "character": 10
+        }
+      }
+    },
+    {
+      "name": "1.java",
+      "returnValue": true,
+      "action": "SORT",
+      "beforeRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
+    },
+    {
+      "name": "2.java",
+      "returnValue": true,
+      "action": "SORT",
+      "beforeRange": {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 0
+        }
+      }
     }
   ]
 }

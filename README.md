@@ -7,21 +7,32 @@ This ability helps to reformat and organize your code.
 
 The plugin exposes a few actions, and it binds these to keyboard shortcuts:
 
-- Move function up (`control+shift+up`).
-- Move function down (`control+shit+up`).
-- Sort functions in a selection (or entire document/class if no are is selected).
+#### Move function up (`control+shift+up`).
+
+#### Move function down (`control+shit+up`).
+
+![Move up demo](https://thumbs.gfycat.com/MatureMistyDoe-size_restricted.gif)
+
+#### Sort functions in a selection (or entire document/class if no are is selected).
+
+![Sort functions demo](https://thumbs.gfycat.com/HopefulMildCowrie-size_restricted.gif)
 
 ### Language Support
 
 A list of programming languages this plugin supports:
 
 - Javascript
+- Java
 
-## Requirements && Extension Settings
+## Disclaimers
 
-No requirements nor extension settings for now.
+For now, does not support nested functions/classes.
 
 ## Release Notes
+
+### 1.0.1
+
+Add support for Java (still no nested classes support).
 
 ### 1.0.0
 

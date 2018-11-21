@@ -37,7 +37,8 @@ export interface ITestMap {
 
 export const resolvePath = (prefix: string, filename: string): string =>
     path.resolve(
-        (vscode.workspace.workspaceFolders || [{ uri: { path: "" } }])[0].uri.path,
+        __dirname,
+        "../../",
         FOLDER,
         prefix,
         filename
@@ -91,13 +92,7 @@ export function readJSON(filename: string): any {
     return JSON.parse(
         String(
             readFileSync(
-                path.resolve(
-                    (vscode.workspace.workspaceFolders || [{ uri: { path: "" } }])[0].uri
-                        .path,
-                    "src",
-                    "test",
-                    filename,
-                )
+                resolvePath("../", filename)
             )
         )
     );

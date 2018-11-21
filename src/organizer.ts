@@ -20,7 +20,7 @@ export default class Organizer {
         this.editor = e;
         this.document = e.document;
 
-        this.language = consts.JAVASCRIPT;
+        this.language = this.document.languageId;
 
         this.gf = new GlobalFunctions(
             new Range(

@@ -22,4 +22,24 @@ export default {
             skipIndex: 1,
         },
     },
+    [c.JAVA]: {
+        [c.CLASS]: {
+            allIndex: 0,
+            nameIndices: [8],
+            reg: /((\n|^)\s*)((public\s+|private\s+)?(abstract\s+)?class\s+([a-zA-Z]\w*))/g,
+            skipIndex: 1,
+        },
+        [c.CLASS_FUNCTION]: {
+            allIndex: 0,
+            nameIndices: [8],
+            reg: /((\n|^)\s*)((public\s+|private\s+|protected\s+)?(static\s+)?(abstract\s+)?([a-zA-Z]\w*)\s+([a-zA-Z]\w*)\s*\()/g,
+            skipIndex: 1,
+        },
+        [c.FUNCTION]: {
+            allIndex: 0,
+            nameIndices: [],
+            reg: /$^/g,
+            skipIndex: 0,
+        }
+    }
 };

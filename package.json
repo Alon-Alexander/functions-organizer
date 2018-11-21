@@ -15,22 +15,26 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:javascript"
+    "onLanguage:javascript",
+    "onLanguage:java"
   ],
   "main": "./out/extension",
   "contributes": {
     "commands": [
       {
         "command": "extension.moveFunctionUp",
-        "title": "FO: Move Function Up"
+        "category": "FO",
+        "title": "Move Function Up"
       },
       {
         "command": "extension.moveFunctionDown",
-        "title": "FO: Move Function Down"
+        "category": "FO",
+        "title": "Move Function Down"
       },
       {
         "command": "extension.sortFunctions",
-        "title": "FO: Sort Functions"
+        "category": "FO",
+        "title": "Sort Functions"
       }
     ],
     "keybindings": [

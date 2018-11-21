@@ -32,7 +32,7 @@ export default {
         [c.CLASS_FUNCTION]: {
             allIndex: 0,
             nameIndices: [8],
-            reg: /((\n|^)\s*)((public\s+|private\s+|protected\s+)?(static\s+)?(abstract\s+)?([a-zA-Z]\w*)\s+([a-zA-Z]\w*)\s*\()/g,
+            reg: /((\n|^)\s*)((public\s+|private\s+|protected\s+)?(static\s+)?(abstract\s+)?([a-zA-Z][\w\[\]\<\>]*)\s+([a-zA-Z]\w*)\s*\()/g,
             skipIndex: 1,
         },
         [c.FUNCTION]: {

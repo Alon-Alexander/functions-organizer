@@ -1,6 +1,6 @@
 # Functions Organizer
 
-A plugin which adds the ability to move functions around the file and swith them (like you can already do with single lines).<br>
+A plugin which adds the ability to move functions around the file and switch them (like you can already do with single lines).<br>
 This ability helps to reformat and organize your code.
 
 ## Features
@@ -8,7 +8,7 @@ This ability helps to reformat and organize your code.
 The plugin exposes a few actions, and it binds these to keyboard shortcuts:
 
 - Move function up (`control+shift+up`).
-- Move function down (`control+shit+up`).
+- Move function down (`control+shift+up`).
 - Sort functions in a selection (or entire document/class if no are is selected).
 
 ### Language Support
@@ -17,7 +17,7 @@ A list of programming languages this plugin supports:
 
 - Javascript
 
-## Requirements && Extension Settings
+## Requirements & Extension Settings
 
 No requirements nor extension settings for now.
 
